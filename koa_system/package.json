@@ -20,6 +20,7 @@
     "loadsh": "^0.0.4",
     "lodash": "^4.17.15",
     "mysql2": "^2.1.0",
+    "nodemailer": "^6.4.4",
     "require-directory": "^2.1.1",
     "sequelize": "^5.6.1",
     "validator": "^12.2.0"

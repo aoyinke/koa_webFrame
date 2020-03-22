@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken')
-/***
- * 
- */
-const findMembers = function (instance, {
+const axios = require('axios')
+    /***
+     * 
+     */
+const findMembers = function(instance, {
     prefix,
     specifiedType,
     filter
@@ -39,23 +40,29 @@ const findMembers = function (instance, {
     return _find(instance)
 }
 
-const generateToken = function(uid, scope){
+const generateToken = function(uid, scope) {
     const secretKey = global.config.security.secretKey
     const expiresIn = global.config.security.expiresIn
     const token = jwt.sign({
         uid,
         scope
-    },secretKey,{
+    }, secretKey, {
         expiresIn
     })
     return token
 }
 
+const request = axios.create({
+    baseURL: "http://localhost:3001/v1/",
+    timeout: 3000,
+    headers: { 'Content-Type': "application/json" }
 
+});
 
 module.exports = {
     findMembers,
     generateToken,
+    request
 }
 
 
