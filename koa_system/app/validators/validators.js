@@ -1,6 +1,6 @@
 const { LinValidator, Rule } = require('../../core/lin-validator-v2')
 const { User } = require('../models/user')
-const { LoginType } = require('../lib/enum')
+const { LoginType,societyType } = require('../lib/enum')
 class PositiveIntegerValidator extends LinValidator {
     constructor() {
         super()
@@ -74,8 +74,93 @@ class TokenValidator extends LinValidator {
     }
 }
 
+class NotEmptyValidator extends LinValidator {
+    constructor() {
+        super()
+        this.token = [
+            new Rule('isLength', '不允许为空', {
+                min: 1
+            })
+        ]
+    }
+}
+
+
+function checkType(vals) {
+    let type = vals.body.type || vals.path.type
+    if (!type) {
+        throw new Error('type是必须参数')
+    }
+    type = parseInt(type)
+
+    if (!LoginType.isThisType(type)) {
+        throw new Error('type参数不合法')
+    }
+}
+
+function checkSocietyType(vals) {
+    let type = vals.body.type || vals.path.type
+    if (!type) {
+        throw new Error('type是必须参数')
+    }
+    type = parseInt(type)
+
+    if (!societyType.isThisType(type)) {
+        throw new Error('type参数不合法')
+    }
+}
+
+class AddCommentValidator extends PositiveIntegerValidator {
+    constructor() {
+        super()
+        this.content = [
+            new Rule('isLength', '不能为空', {
+                min: 1
+            })
+        ]
+    }
+}
+
+
+class LikeValidator extends PositiveIntegerValidator {
+    constructor() {
+        super()
+        this.validateType = checkSocietyType
+        // const checker = new Checker(ArtType)
+        // this.validateType = checker.check.bind(checker)
+    }
+}
+
+class GroupInfoValidator extends LinValidator{
+    constructor(){
+        super()
+        this.groupName = [
+            new Rule('isLength', '名称在1-16个中文字符之间', { min: 2, max: 32 })
+        ]
+        this.groupType = [
+            new Rule('isLength','社团种类不能为空',{ min: 2})
+        ]
+    }
+}
+class ActivityValidator extends LinValidator{
+    constructor(){
+        super()
+        this.title = [
+            new Rule('isOptional'),
+            new Rule('isLength', '密码长度不符合规范', { min: 6, max: 32 })
+        ]
+    
+    }
+}
+
 module.exports = {
     PositiveIntegerValidator,
     RegisterValidator,
-    TokenValidator
+    TokenValidator,
+    ActivityValidator,
+    NotEmptyValidator,
+    LikeValidator,
+    AddCommentValidator,
+    GroupInfoValidator
+    
 }

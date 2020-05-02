@@ -15,6 +15,16 @@ const LoginType = {
     isThisType
 }
 
+
+const societyType = {
+    GROUPDYNAMIC:100,
+    ACTIVITY:200,
+    ANSWER:300,
+    KNOWLEDGE:400,
+    isThisType
+}
+
 module.exports = {
-    LoginType
+    LoginType,
+    societyType
 }

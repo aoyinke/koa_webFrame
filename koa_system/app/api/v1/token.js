@@ -5,6 +5,7 @@ const { Auth } = require('../../../middlewares/auth')
 const { User } = require('../../models/user')
 const { LoginType } = require('../../lib/enum')
 const { generateToken } = require('../../../core/util')
+const {WXManager} = require('../../services/wx')
 const router = new Router({
     prefix: '/v1/user'
 })
@@ -21,6 +22,7 @@ router.post('/token', async(ctx) => {
             token = await emailLogin(email, plainPassword)
             break;
         case LoginType.USER_MINI_PROGRAM:
+            token = await WXManager.codeToToken(email)
             break;
         default:
             throw new global.errs.ParameterException('没有相应的处理函数')

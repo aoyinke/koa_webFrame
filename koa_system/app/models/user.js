@@ -18,6 +18,20 @@ class User extends Model {
         }
         return user
     }
+
+
+    static async getUserOpenId(openid){
+        let user = User.findOne({
+            where:openid
+        })
+        return user
+    }
+
+    static async registerUserOpenId(openid){
+        return await User.create({
+            openid
+        })
+    }
 }
 
 
@@ -45,6 +59,17 @@ User.init({
         }
 
     },
+    avatar:{
+        type: Sequelize.STRING
+    },
+    sex:{type: Sequelize.STRING},
+    birthday:{type: Sequelize.STRING},
+    job:{type: Sequelize.STRING},
+    homeTown:{type: Sequelize.STRING},
+    love:{type: Sequelize.STRING},
+    intersetsTag:{type: Sequelize.STRING},
+    coverImg:{type: Sequelize.STRING},
+    selfDescription:{type: Sequelize.STRING},
     openid: {
         type: Sequelize.STRING(64),
         unique: true

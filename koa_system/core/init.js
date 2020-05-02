@@ -3,7 +3,7 @@ const Router = require('koa-router')
 
 
 class InitManager {
-    static initCore(app) {
+    static  initCore(app) {
         InitManager.app = app
         InitManager.initLoadRouters()
         InitManager.loadException()
@@ -17,17 +17,16 @@ class InitManager {
             visit: whenLoadModule
         })
 
-        function whenLoadModule(obj) {
+        async function whenLoadModule(obj) {
             if (obj instanceof Router) {
-                InitManager.app.use(obj.routes())
+                await InitManager.app.use(obj.routes())
             }
         }
     }
 
     static loadException() {
-        const errsPath = `${process.cwd()}/middlewares/exception.js`
-        const errs = require('./http-exception')
-        global.errs = errs
+        const errors = require('./http-exception')
+        global.errs = errors
     }
 
     static loadConfig() {
