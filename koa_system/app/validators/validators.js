@@ -134,25 +134,43 @@ class LikeValidator extends PositiveIntegerValidator {
 class GroupInfoValidator extends LinValidator{
     constructor(){
         super()
-        this.groupName = [
-            new Rule('isLength', '名称在1-16个中文字符之间', { min: 2, max: 32 })
-        ]
-        this.groupType = [
-            new Rule('isLength','社团种类不能为空',{ min: 2})
-        ]
+        
     }
 }
 class ActivityValidator extends LinValidator{
     constructor(){
         super()
-        this.title = [
-            new Rule('isOptional'),
-            new Rule('isLength', '密码长度不符合规范', { min: 6, max: 32 })
+        this.type = [
+            
+            new Rule('isLength', 'type是必填参数', { min: 1})
+        ]
+        this.category = [
+            new Rule('isLength', 'category是必填参数', { min: 1})
         ]
     
     }
 }
-
+class GetActivityValidator extends LinValidator{
+    constructor(){
+        super()
+        this.limit = [
+            
+            new Rule('isLength', 'limit是必填参数', { min: 1})
+        ]
+        this.offset = [
+            new Rule('isLength', 'offset是必填参数', { min: 1})
+        ]
+    
+    }
+}
+class UpdateUserInfoValidator extends LinValidator{
+    constructor(){
+        super()
+        this.nickName = [
+            new Rule('isLength', 'nickName不能为空', { min: 1})
+        ]
+    }
+}
 module.exports = {
     PositiveIntegerValidator,
     RegisterValidator,
@@ -161,6 +179,8 @@ module.exports = {
     NotEmptyValidator,
     LikeValidator,
     AddCommentValidator,
-    GroupInfoValidator
+    GroupInfoValidator,
+    UpdateUserInfoValidator,
+    GetActivityValidator
     
 }

@@ -2,8 +2,18 @@
 const { Sequelize, Model } = require('sequelize')
 const sequelize = require('../../core/db')
 
+
 class GetActivityInfo extends Model {
     
+    static async getAllactivity(activity_id,type){
+        let activities = await GetActivityInfo.findAll()
+        for(let activity of activities){
+            console.log(activity)
+            // if(activity.groupId){
+
+            // }
+        }
+    }
 }
 
 

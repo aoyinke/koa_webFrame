@@ -9,27 +9,18 @@ class Member extends Model{
 
     }
 
-    static async joinGroup(groupId,uid){
-
-        let isMember = await Member.findOne({
-            where:uid
-        })
-
-        if(isMember){
-            throw new Error("已经加入该小组，不可重估加入")
-        }
-        Member.create({
-            groupId,
-            uid
-        })
-    }
+    
 
 }
 
 
 Member.init({
     uid:{type:Sequelize.INTEGER},
-    groupId:{type:Sequelize.INTEGER}
+    groupId:{type:Sequelize.INTEGER},
+    department:Sequelize.STRING,
+    poisition:Sequelize.STRING,
+    avatar:Sequelize.STRING,
+    nickName:Sequelize.STRING
 },{ sequelize, tableName: 'groupMember' })
 
 

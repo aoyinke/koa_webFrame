@@ -71,6 +71,14 @@ class DislikeError extends HttpException {
     }
 }
 
+class SubmitError extends HttpException{
+    constructor(msg, error_code) {
+        super()
+        this.code = 400
+        this.msg = "你已经递交过申请"
+        this.error_code = 60003
+    }
+}
 
 module.exports = {
     HttpException,
@@ -80,5 +88,6 @@ module.exports = {
     AuthFailed,
     Forbbiden,
     LikeError,
-    DislikeError
+    DislikeError,
+    SubmitError
 }

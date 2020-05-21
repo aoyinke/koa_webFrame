@@ -2,8 +2,10 @@ const Router = require('koa-router')
 const router = new Router({
     prefix: '/v1/user'
 })
-const { RegisterValidator } = require('../../validators/validators')
+const { RegisterValidator,UpdateUserInfoValidator } = require('../../validators/validators')
 const { User } = require('../../models/user')
+const {success} = require('../../lib/helper')
+const {Auth} = require('../../../middlewares/auth')
 
 router.post('/register', async(ctx) => {
     const v = await new RegisterValidator().validate(ctx)
@@ -17,4 +19,23 @@ router.post('/register', async(ctx) => {
 
 })
 
+router.post('/update',new Auth().m,async(ctx)=>{
+    const v = await new UpdateUserInfoValidator().validate(ctx)
+    const userInfo = v.get('body')
+    
+    await User.update({
+        ...userInfo
+    },{
+        where:{
+            id:ctx.auth.uid
+        }
+    })
+    success("成功修改用户信息~")
+    
+})
+
+router.get('/getUserInfo',new Auth().m,async(ctx)=>{
+    let uesrInfo = await User.getUserInfo(ctx.auth.uid)
+    ctx.body=uesrInfo
+})
 module.exports = router

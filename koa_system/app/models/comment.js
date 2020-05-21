@@ -3,25 +3,29 @@ const { Sequelize, Model } = require('sequelize')
 const sequelize = require('../../core/db')
 
 const {GroupInfo} = require('.././models/groupInfo')
+const {User} = require('../models/user')
 class Comment extends Model {
     
-    static async addActivityComment(activity_id,content,type,uid){
+    static async addActivityComment(commentInfo,uid){
         
         return await Comment.create({
-            activity_id,
-            content,
             uid,
-            type
+            ...commentInfo
         })
     }
 
     static async getComment(activity_id){
-        
-        const comments = Comment.findAll({
-            where:activity_id
+        const comments = await Comment.findAll({
+            where:{activity_id},
+            raw:true,
+            attributes:{exclude:['updateAt','deleteAt']}
         })
+        
         return comments
     }
+
+
+    
 }
 
 
@@ -32,6 +36,8 @@ Comment.init({
         autoIncrement: true
     },
     uid:{type:Sequelize.INTEGER},
+    avatar:Sequelize.STRING,
+    nickName:Sequelize.STRING,
     activity_id:{type:Sequelize.INTEGER},
     type:{type:Sequelize.INTEGER},
     content:{type:Sequelize.STRING},

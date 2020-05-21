@@ -1,6 +1,6 @@
 const Router = require('koa-router')
 
-const { TokenValidator } = require('../../validators/validators')
+const { TokenValidator,NotEmptyValidator } = require('../../validators/validators')
 const { Auth } = require('../../../middlewares/auth')
 const { User } = require('../../models/user')
 const { LoginType } = require('../../lib/enum')
@@ -17,18 +17,31 @@ router.post('/token', async(ctx) => {
     const plainPassword = v.get('body.secret')
     const type = v.get('body.type')
     let token;
+    let res;
     switch (type) {
         case LoginType.USER_EMAIL:
             token = await emailLogin(email, plainPassword)
             break;
         case LoginType.USER_MINI_PROGRAM:
-            token = await WXManager.codeToToken(email)
+            res = await WXManager.codeToToken(email)
+            token = res.token
+            uid = res.uid
             break;
         default:
             throw new global.errs.ParameterException('没有相应的处理函数')
     }
     ctx.body = {
-        token
+        token,
+        uid
+    }
+})
+
+router.post('/verify', async (ctx)=>{
+    // token
+    const v =await new NotEmptyValidator().validate(ctx)
+    const result = Auth.verifyToken(v.get('body.token'))
+    ctx.body = {
+        is_valid:result
     }
 })
 

@@ -22,12 +22,12 @@ class WXManager {
             throw new global.errs.AuthFailed("openid获取失败：" + errmsg)
         }
 
-        let user = User.getUserOpenId(result.data.openid)
+        let user = await User.getUserByOpenid(result.data.openid)
         if(!user){
             user = await User.registerUserOpenId(result.data.openid)
         }
 
-        return generateToken(user.id,Auth.USER)
+        return {token:generateToken(user.id,Auth.USER),uid:user.id}
     }
 
     
