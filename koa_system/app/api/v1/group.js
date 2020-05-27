@@ -24,6 +24,34 @@ router.get('/detail',new Auth().m,async (ctx)=>{
     ctx.body = groupInfo
 })
 
+router.get('/findUserGroup',new Auth().m,async (ctx)=>{
+    let info = await Member.findAll({
+        where:{
+            uid:ctx.auth.uid
+        },
+        attributes:['groupId','groupName'],
+        raw:true
+    })
+    ctx.body = {...info}
+})
+
+router.get('/findGroupList',new Auth().m,async ctx=>{
+    let {college} = ctx.request.query
+    let groups = await GroupInfo.findAll({
+        where:{
+            college:college
+        },
+        attributes:['logo','id','groupName','description','tags','category'],
+        raw:true
+    })
+    ctx.body = groups
+})
+
+router.get('/findGroupColleges',new Auth().m,async ctx=>{
+    let colleges = await GroupInfo.findGroupColleges()
+    ctx.body = colleges
+})
+
 router.post('/applicant',new Auth().m,async ctx=>{
     let applicant = ctx.request.body
     await Applicant.handleSubmit(applicant,ctx.auth.uid)
@@ -34,6 +62,15 @@ router.post('/approveJoin',new Auth().m,async (ctx)=>{
     let memberInfo = ctx.request.body
     await Applicant.approveJoinGroup(memberInfo,ctx.auth.uid)
     success("同意加入")
+})
+
+router.post('/join',new Auth().m,async (ctx)=>{
+    let info = ctx.request.body
+    await Member.create({
+        uid:ctx.auth.uid,
+        ...info
+    })
+    success("创建接口")
 })
 
 module.exports = router

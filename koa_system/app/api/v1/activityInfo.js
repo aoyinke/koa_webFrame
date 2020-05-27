@@ -7,6 +7,7 @@ const {ActivityValidator,AddCommentValidator} = require('@validator')
 
 const {Community} = require('../../models/community')
 const {Comment} = require('../../models/comment')
+const {User} = require('../../models/user')
 const router = new Router({
     prefix:"/v1/ActivityInfo"
 })
@@ -27,8 +28,8 @@ router.post('/addComment', new Auth().m, async (ctx)=>{
 })
 
 router.get('/getActivity', async(ctx)=>{
-    let {currentPage} = ctx.request.query
-    let res = await Community.findActivity(currentPage)
+    let {currentPage,category} = ctx.request.query
+    let res = await Community.findActivity(currentPage,category)
     ctx.body = res
 })
 
@@ -76,4 +77,21 @@ router.post('/upLoadActivity',new Auth().m, async(ctx)=>{
 
 })
 
+router.get('/userLiked',new Auth().m,async(ctx)=>{
+    let {type,currentPage} = ctx.request.query
+    let community = []
+    let {interestsTag} = await User.findOne({
+        id:ctx.auth.uid,
+        raw:true,
+        attributes:['interestsTag']
+    })
+    
+    interestsTag = interestsTag.split(',')
+    for(let i of interestsTag){
+        
+       let tmp = await Community.getCommunity(type,currentPage,i)
+       community.push(...tmp)
+    }
+    ctx.body = community
+})
 module.exports = router

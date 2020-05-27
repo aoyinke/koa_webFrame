@@ -14,6 +14,14 @@ class GroupInfo extends Model {
 
     }
 
+    static async findGroupColleges(){
+        return await GroupInfo.findAll({
+            group:'college',
+            attributes:['college'],
+            raw:true
+        })
+    }
+
     static async getGroupInfo(groupId){
         return await GroupInfo.findOne({
             where:{
@@ -35,7 +43,7 @@ GroupInfo.init({
     },
     groupName:{type:Sequelize.STRING},
     college:Sequelize.STRING,
-    desctiption:{type:Sequelize.STRING},
+    description:{type:Sequelize.STRING},
     coverImg:{type:Sequelize.STRING},
     logo:{type:Sequelize.STRING},
     category:{type:Sequelize.STRING},
@@ -44,7 +52,7 @@ GroupInfo.init({
     fav_nums:{type:Sequelize.INTEGER,defaultValue:0},
     good_nums:{type:Sequelize.INTEGER,defaultValue:0},
     concat:{type:Sequelize.STRING,defaultValue:'没有联系方式的话，小伙伴们会找不到你们哦/(ㄒoㄒ)/~~'},
-    achiecements:{type:Sequelize.STRING,defaultValue:"赶快编辑属于咱们的荣誉墙吧！"},
+    achievements:{type:Sequelize.STRING,defaultValue:"赶快编辑属于咱们的荣誉墙吧！"},
     specialActivity:{type:Sequelize.STRING,defaultValue:"赶快编辑属于咱们的特色活动吧！"},
 }, { sequelize, tableName: 'groupInfo' })
 

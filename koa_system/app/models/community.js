@@ -107,6 +107,56 @@ class Community {
         return res  
     }
 
+    static async getCommunity(type,currentPage,category){
+        let community = {}
+        
+        switch(parseInt(type)){
+            case 100:
+                community = Activity;
+                break;
+            case 200:
+                community = GroupDynamic
+                break;
+            case 300:
+                community = Answer
+                break;
+            case 400:
+                community = Knowledge
+        }
+        let offset = (currentPage - 1) * 10;
+        let dataList = await community.findAndCountAll({
+            
+            //offet去掉前多少个数据
+            offset,
+            //limit每页数据数量
+            limit: 10,
+            raw:true,
+            where:{
+                category
+            }
+            
+        }).then(res => {
+            let result = {};
+            result.data = res.rows;
+            result.total = res.count;
+            return result;
+        }).then(async res=> {
+            
+            let infoList = []
+            if(res.data.length){
+                for(let i of res.data){
+                    let res = await Community._findOtherInfo(i.groupId,i.id,i)
+                    infoList.push(res)
+                }
+            }
+            
+            
+            return infoList
+        })
+
+        return dataList
+    }
+
     static async _findDb(type){
         switch (type){
             case 100:
@@ -125,7 +175,7 @@ class Community {
         }
     }
 
-    static async findActivity(currentPage){
+    static async findActivity(currentPage,category){
         let offset = (currentPage - 1) * 10;
         let dataList = await Activity.findAndCountAll({
             
@@ -134,7 +184,9 @@ class Community {
             //limit每页数据数量
             limit: 10,
             raw:true,
-            group:'category'
+            where:{
+                category
+            }
             
         }).then(res => {
             let result = {};
@@ -146,12 +198,8 @@ class Community {
             let infoList = []
             if(res.data.length){
                 for(let i of res.data){
-                    let res = await Community._findOtherInfo(i.groupId,i.id)
-                    i.comments = res.comments
-                    i.videoSrc = res.videoSrc
-                    i.groupInfo = res.groupInfo
-                    i.imgs = res.imgs
-                    infoList.push(i)
+                    let res = await Community._findOtherInfo(i.groupId,i.id,i)
+                    infoList.push(res)
                 }
             }
             
@@ -259,13 +307,14 @@ class Community {
     }
     
 
-    static async _findOtherInfo(groupId,activity_id){
+    static async _findOtherInfo(groupId,activity_id,data){
+        let res = data
         let groupInfo = await GroupInfo.findOne({
             where:{
                 id:groupId
             },
             raw:true,
-            attributes:['id','logo','tags','college','groupName']
+            attributes:['id','logo','tags','college','groupName','category']
         })
         let imgs = await ActivityImgs.findAll({
             where:{
@@ -282,7 +331,14 @@ class Community {
             attributes:['url']
         })
         let comments = await Comment.getComment(activity_id)
-        return {comments,groupInfo,imgs,videoSrc:videoSrc}
+        if(res){
+            res.comments = comments
+            res.videoSrc = videoSrc
+            res.groupInfo = groupInfo
+            res.imgs = imgs
+        }
+        
+        return res
         
     }
 }
