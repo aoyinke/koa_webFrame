@@ -10,7 +10,7 @@ const router = new Router({
 
 router.get('/needList',new Auth().m,async ctx=>{
     let {currentPage,category} = ctx.request.query
-    let needList = await Need.getNeedList(currentPage,category)
+    let needList = await Need.getNeedList(currentPage,category,ctx.auth.uid)
     ctx.body = needList
 })
 

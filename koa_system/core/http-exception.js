@@ -80,6 +80,14 @@ class SubmitError extends HttpException{
     }
 }
 
+class GroupRegisterError extends HttpException{
+    constructor(msg, error_code) {
+        super()
+        this.code = 400
+        this.msg = "该社团已经被注册过"
+        this.error_code = 60004
+    }
+}
 module.exports = {
     HttpException,
     ParameterException,
@@ -89,5 +97,6 @@ module.exports = {
     Forbbiden,
     LikeError,
     DislikeError,
-    SubmitError
+    SubmitError,
+    GroupRegisterError
 }

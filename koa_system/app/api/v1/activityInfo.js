@@ -33,24 +33,11 @@ router.get('/getActivity', async(ctx)=>{
     ctx.body = res
 })
 
-router.get('/getDynamic', async(ctx)=>{
-    let {currentPage} = ctx.request.query
-    let res = await Community.findDynamic(currentPage)
-    ctx.body = res
+router.get('/community',new Auth().m, async (ctx)=>{
+    let {currentPage,category} = ctx.request.query
+    let communityList = await Community.getInfoList(currentPage,category)
+    ctx.body = communityList
 })
-
-router.get('/getAnswer', async(ctx)=>{
-    let {currentPage} = ctx.request.query
-    let res = await Community.findActivity(currentPage)
-    ctx.body = res
-})
-
-router.get('/getKnowledge', async(ctx)=>{
-    let {currentPage} = ctx.request.query
-    let res = await Community.findKnowledge(currentPage)
-    ctx.body = res
-})
-
 
 
 router.get('/detail',async(ctx)=>{

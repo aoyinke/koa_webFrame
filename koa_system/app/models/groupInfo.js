@@ -6,11 +6,44 @@ const {Member} = require('./groupMember')
 class GroupInfo extends Model {
     
 
-    static async groupRegister(groupInfo){
+    static async groupRegister(groupInfo,uid){
 
-        return await GroupInfo.create({
-            ...groupInfo
+        // return sequelize.transaction(async t=>{
+        //     await Favor.create({
+        //         activity_id,
+        //         type,
+        //         uid
+        //     },{transaction:t})
+        //     const activity = await Community.getData(activity_id,type)
+        //     await activity.increment('fav_nums',{
+        //         by:1,
+        //         transaction:t
+        //     })
+        // })
+        let isGroup = await GroupInfo.findOne({
+            where:{
+                college:groupInfo.college,
+                groupName:groupInfo.groupName
+            }
         })
+        if(!isGroup){
+            return sequelize.transaction(async t=>{
+                const group = await GroupInfo.create({
+                    ...groupInfo
+                    
+                },{transaction:t})
+                await Member.create({
+                    uid,
+                    groupId:group.id,
+                    dapatment:"未知",
+                    poisition:"社长"
+                },{transaction:t})
+            })
+        }else{
+            throw new global.errs.GroupRegisterError()
+        }
+        
+        
 
     }
 
@@ -23,11 +56,23 @@ class GroupInfo extends Model {
     }
 
     static async getGroupInfo(groupId){
-        return await GroupInfo.findOne({
+        let groupInfo =  await GroupInfo.findOne({
             where:{
                 id:groupId
-            }
+            },
+            raw:true
         })
+        let coverImgs = await GroupCoverImgs.findAll({
+            where:{
+                groupId
+            },
+            raw:true,
+            attributes:['url']
+        })
+        groupInfo.coverImgs = coverImgs.map(item=>{
+            return item.url
+        }) || []
+        return groupInfo
     }
 
     
@@ -44,7 +89,6 @@ GroupInfo.init({
     groupName:{type:Sequelize.STRING},
     college:Sequelize.STRING,
     description:{type:Sequelize.STRING},
-    coverImg:{type:Sequelize.STRING},
     logo:{type:Sequelize.STRING},
     category:{type:Sequelize.STRING},
     startTime:{type:Sequelize.DATEONLY},
@@ -115,7 +159,18 @@ Applicant.init({
     nickName:Sequelize.STRING,
     uid:Sequelize.INTEGER
 }, { sequelize, tableName: 'applicant' })
+
+
+class GroupCoverImgs extends Model{
+
+}
+
+GroupCoverImgs.init({
+    groupId:Sequelize.INTEGER,
+    url:Sequelize.STRING
+}, { sequelize, tableName: 'groupCoverImgs' })
 module.exports = {
     GroupInfo,
-    Applicant
+    Applicant,
+    GroupCoverImgs
 }

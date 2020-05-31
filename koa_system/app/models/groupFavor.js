@@ -66,7 +66,8 @@ class GroupFavor extends Model{
 
 GroupFavor.init({
     uid:Sequelize.INTEGER,
-    groupId:Sequelize.INTEGER
+    groupId:Sequelize.INTEGER,
+    status:{type:Sequelize.INTEGER,defaultValue:0}
 }, { sequelize, tableName: 'groupFavor' })
 
 

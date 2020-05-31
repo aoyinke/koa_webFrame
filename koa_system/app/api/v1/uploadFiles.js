@@ -6,7 +6,7 @@ const { Auth } = require('../../../middlewares/auth')
 const {Task,TaskImgs} = require('../../models/task')
 const {UserCoverImgs} = require('../../models/user')
 const {ActivityImgs,ActivityVideos} = require('../../models/activityInfo')
-const {GroupInfo} = require('../../models/groupInfo')
+const {GroupInfo,GroupCoverImgs} = require('../../models/groupInfo')
 
 const {uploadImg} = require('../../../utils/upload')
 const router = new Router({
@@ -69,6 +69,14 @@ router.post('/userCoverImgs',uploadImg,new Auth().m,async ctx=>{
   })
 })
 
+router.post('/groupCoverImgs',uploadImg,new Auth().m,async ctx=>{
+  let groupId = ctx.request.body.groupId
+  let groupCoverImg = ctx.files.uploadImgUrl
+  await GroupCoverImgs.create({
+    groupId,
+    url:groupCoverImg
+  })
+})
 
 router.post('/taskImgs',uploadImg,new Auth().m,async ctx=>{
   let taskId = ctx.request.body.taskId

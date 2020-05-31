@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const dateFormat = require('./dateFormat.js')
+const {basicUrl} = require('../config/config')
 const upload= {
         PUBLIC:"public/",
         UPLOAD: '/upload',
@@ -69,7 +70,7 @@ const uploadImg = async (ctx,next) => {
             
          
     
-    ctx.files = {uploadVideo:uploadVideo,uploadImgUrl:uploadImgUrl}
+    ctx.files = {uploadVideo:basicUrl + uploadVideo,uploadImgUrl:basicUrl + uploadImgUrl}
     next()
 }
 

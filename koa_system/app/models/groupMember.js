@@ -19,9 +19,7 @@ Member.init({
     groupId:{type:Sequelize.INTEGER},
     department:Sequelize.STRING,
     poisition:Sequelize.STRING,
-    avatar:Sequelize.STRING,
-    nickName:Sequelize.STRING,
-    groupName:Sequelize.STRING,
+    
 },{ sequelize, tableName: 'groupMember' })
 
 

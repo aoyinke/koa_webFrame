@@ -1,7 +1,7 @@
 const bycrypt = require('bcryptjs')
 const { Sequelize, Model } = require('sequelize')
 const sequelize = require('../../core/db')
-
+const {basicUrl} = require('../../config/config')
 class User extends Model {
     static async vertifyEmailPassword(account, plainPassword) {
         const user = await User.findOne({
@@ -92,7 +92,7 @@ User.init({
     },
     avatar:{
         type: Sequelize.STRING,
-        defaultValue:"static/defaultAvatar.jpg"
+        defaultValue:basicUrl + "static/defaultAvatar.jpg"
         
     },
     sex:{

@@ -14,7 +14,7 @@ const router = new Router({
 router.post('/register', new Auth().m,async (ctx)=>{
     const v =  await new GroupInfoValidator().validate(ctx)
     const  groupInfo = v.get('body')
-    let group = await GroupInfo.groupRegister(groupInfo)
+    let group = await GroupInfo.groupRegister(groupInfo,ctx.auth.uid)
     ctx.body = group
 })
 
@@ -32,7 +32,7 @@ router.get('/findUserGroup',new Auth().m,async (ctx)=>{
         attributes:['groupId','groupName'],
         raw:true
     })
-    ctx.body = {...info}
+    ctx.body = info
 })
 
 router.get('/findGroupList',new Auth().m,async ctx=>{
@@ -50,6 +50,16 @@ router.get('/findGroupList',new Auth().m,async ctx=>{
 router.get('/findGroupColleges',new Auth().m,async ctx=>{
     let colleges = await GroupInfo.findGroupColleges()
     ctx.body = colleges
+})
+
+router.get('/groupMembers',new Auth().m,async ctx=>{
+    let {groupId} = ctx.request.query
+    let members = await Member.findAll({
+        where:{
+            groupId
+        }
+    })
+    ctx.body = members.splice(3)
 })
 
 router.post('/applicant',new Auth().m,async ctx=>{
@@ -73,4 +83,16 @@ router.post('/join',new Auth().m,async (ctx)=>{
     success("创建接口")
 })
 
+router.post('/updateGroupInfo',new Auth().m,async (ctx)=>{
+    let info = ctx.request.body
+    
+    await GroupInfo.update({
+        ...info
+    },
+    {
+        where:{
+            id:info.id
+        }
+    })
+})
 module.exports = router

@@ -36,16 +36,10 @@ Comment.init({
         autoIncrement: true
     },
     uid:{type:Sequelize.INTEGER},
-    avatar:Sequelize.STRING,
-    nickName:Sequelize.STRING,
     activity_id:{type:Sequelize.INTEGER},
     type:{type:Sequelize.INTEGER},
     content:{type:Sequelize.STRING},
     likeNum:{type:Sequelize.INTEGER,defaultValue:0},
-    likeStatus:{
-        type:Sequelize.BOOLEAN,
-        defaultValue:false
-    }
 }, { sequelize, tableName: 'comment' })
 
 

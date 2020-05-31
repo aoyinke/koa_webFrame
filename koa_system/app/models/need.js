@@ -1,12 +1,19 @@
 
 const { Sequelize, Model } = require('sequelize')
 const sequelize = require('../../core/db')
-
+const {User} = require('./user')
 
 class Need extends Model{
 
-    static async getNeedList(currentPage,category){
+    static async getNeedList(currentPage,category,uid){
         let offset = (currentPage - 1) * 10;
+        let userInfo = await User.findOne({
+            where:{
+                id:uid
+            },
+            raw:true,
+            attributes:['avatar','nickName','college']
+        })
         let needs = await Need.findAndCountAll({
             offset:offset,
             limit:10,
@@ -14,6 +21,9 @@ class Need extends Model{
             where:{
                 category
             }
+        })
+        needs.rows.forEach(item=>{
+            item.userInfo =userInfo
         })
         return needs.rows
     }
@@ -27,10 +37,9 @@ class Need extends Model{
 Need.init({
     uid:{type:Sequelize.INTEGER},
     content:Sequelize.STRING,
-    logo:Sequelize.STRING,
-    nickName:Sequelize.STRING,
     fav_nums:{type:Sequelize.INTEGER,defaultValue:0},
-    category:Sequelize.STRING
+    category:Sequelize.STRING,
+    title:Sequelize.STRING
 },{ sequelize, tableName: 'need' })
 
 class Supply extends Model{
