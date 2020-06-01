@@ -25,13 +25,7 @@ router.get('/detail',new Auth().m,async (ctx)=>{
 })
 
 router.get('/findUserGroup',new Auth().m,async (ctx)=>{
-    let info = await Member.findAll({
-        where:{
-            uid:ctx.auth.uid
-        },
-        attributes:['groupId','groupName'],
-        raw:true
-    })
+    let info = await GroupInfo.findUserGroup(ctx.auth.uid)
     ctx.body = info
 })
 
@@ -54,12 +48,8 @@ router.get('/findGroupColleges',new Auth().m,async ctx=>{
 
 router.get('/groupMembers',new Auth().m,async ctx=>{
     let {groupId} = ctx.request.query
-    let members = await Member.findAll({
-        where:{
-            groupId
-        }
-    })
-    ctx.body = members.splice(3)
+    let members = await Member.findMember(groupId)
+    ctx.body = members.splice(0,3)
 })
 
 router.post('/applicant',new Auth().m,async ctx=>{

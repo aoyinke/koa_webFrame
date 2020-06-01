@@ -5,6 +5,10 @@ const sequelize = require('../../core/db')
 
 class Task extends Model{
 
+    static async findTaskMember(){
+
+    }
+
     static async changeTask(taskInfo){
         await Task.update({
             ...taskInfo
@@ -49,8 +53,6 @@ class Task extends Model{
 Task.init({
     uid:{type:Sequelize.INTEGER},
     content:Sequelize.STRING,
-    logo:Sequelize.STRING,
-    nickName:Sequelize.STRING,
     click_nums:{type:Sequelize.INTEGER,defaultValue:0},
     belongActivity:Sequelize.STRING,
     taskName:Sequelize.STRING,
@@ -68,7 +70,16 @@ TaskImgs.init({
     url:Sequelize.STRING
 },{ sequelize, tableName: 'taskImgs' })
 
+class TaskMember extends Model{
+
+}
+TaskMember.init({
+    uid:Sequelize.INTEGER,
+    taskId:sequelize.INTEGER
+},{ sequelize, tableName: 'taskMember' })
+
 module.exports = {
     Task,
-    TaskImgs
+    TaskImgs,
+    TaskMember
 }

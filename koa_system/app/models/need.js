@@ -6,6 +6,19 @@ const {User} = require('./user')
 class Need extends Model{
 
     static async getNeedList(currentPage,category,uid){
+        let type = ''
+        category = parseInt(category)
+        switch(category){
+            case 100:
+                type="众投活动"
+                break
+            case 101:
+                type="大佬赞助"
+                break
+            case 102:
+                type="技能需求"
+                break
+        }
         let offset = (currentPage - 1) * 10;
         let userInfo = await User.findOne({
             where:{
@@ -19,13 +32,13 @@ class Need extends Model{
             limit:10,
             raw:true,
             where:{
-                category
+                category:type
             }
         })
-        needs.rows.forEach(item=>{
-            item.userInfo =userInfo
+        needs = needs.rows.map(item=>{
+            return Object.assign(item,{userInfo:userInfo})
         })
-        return needs.rows
+        return needs
     }
 
     

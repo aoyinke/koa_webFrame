@@ -1,5 +1,5 @@
 
-const { Sequelize, Model } = require('sequelize')
+const { Sequelize, Model,Op } = require('sequelize')
 const sequelize = require('../../core/db')
 
 const {Member} = require('./groupMember')
@@ -55,6 +55,34 @@ class GroupInfo extends Model {
         })
     }
 
+    static async findUserGroup(uid){
+        let groupList = await Member.findAll({
+            where:{
+                uid
+            },
+            attributes:['groupId'],
+            raw:true
+        })
+        let ids = groupList.map(group=>{
+            return group.groupId
+
+        })
+        let groups = await GroupInfo.findAll({
+            where:{
+                id: {
+                    [Op.in]: ids
+                },
+            },
+            attributes:['groupName'],
+            raw:true
+        })
+        let userGroups = groups.map((group,index)=>{
+            return {groupName:group.groupName,groupId:ids[index]}
+        })
+        return userGroups
+
+    }
+
     static async getGroupInfo(groupId){
         let groupInfo =  await GroupInfo.findOne({
             where:{
@@ -66,7 +94,6 @@ class GroupInfo extends Model {
             where:{
                 groupId
             },
-            raw:true,
             attributes:['url']
         })
         groupInfo.coverImgs = coverImgs.map(item=>{
@@ -169,6 +196,8 @@ GroupCoverImgs.init({
     groupId:Sequelize.INTEGER,
     url:Sequelize.STRING
 }, { sequelize, tableName: 'groupCoverImgs' })
+
+
 module.exports = {
     GroupInfo,
     Applicant,
