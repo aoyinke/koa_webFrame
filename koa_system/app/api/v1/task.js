@@ -9,18 +9,15 @@ const router = new Router({
 
 
 router.get('/taskList',new Auth().m,async ctx=>{
-    let {currentPage,belongActivity} = ctx.request.query
-    let taskList = await Task.getTaskList(currentPage,belongActivity)
+    let {groupId,belongActivity} = ctx.request.query
+    let taskList = await Task.getTaskList(groupId,belongActivity)
     ctx.body = taskList
 })
 
 
 router.post('/addTask',new Auth().m,async ctx=>{
     let taskInfo = ctx.request.body
-    let task = await Task.create({
-        uid:ctx.auth.uid,
-        ...taskInfo
-    })
+    let task = await Task.addTask(taskInfo,ctx.auth.uid)
     ctx.body = task
     
 })

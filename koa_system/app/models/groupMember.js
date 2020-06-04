@@ -34,6 +34,15 @@ class Member extends Model{
         return members
     }
 
+    static async getMember(groupId){
+        let members = await Member.findAll({
+            where:{
+                groupId
+            }
+
+        })
+    }
+
     
 
 }
@@ -44,7 +53,7 @@ Member.init({
     groupId:{type:Sequelize.INTEGER},
     department:Sequelize.STRING,
     poisition:Sequelize.STRING,
-    
+    auth:Sequelize.INTEGER
 },{ sequelize, tableName: 'groupMember' })
 
 

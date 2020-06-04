@@ -36,7 +36,8 @@ class GroupInfo extends Model {
                     uid,
                     groupId:group.id,
                     dapatment:"未知",
-                    poisition:"社长"
+                    poisition:"社长",
+                    auth:16
                 },{transaction:t})
             })
         }else{
