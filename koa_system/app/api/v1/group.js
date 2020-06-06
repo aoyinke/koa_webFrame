@@ -18,6 +18,7 @@ router.post('/register', new Auth().m,async (ctx)=>{
     ctx.body = group
 })
 
+
 router.get('/detail',new Auth().m,async (ctx)=>{
     let {groupId} = ctx.request.query
     let groupInfo = await GroupInfo.getGroupInfo(groupId)
@@ -46,10 +47,21 @@ router.get('/findGroupColleges',new Auth().m,async ctx=>{
     ctx.body = colleges
 })
 
+router.post('/changeMemberAuth',new Auth().m,async ctx=>{
+    let {auth,department,groupId,id} = ctx.request.body
+    await Member.changeMemberAuth(groupId,id,auth,department)
+})
+
 router.get('/groupMembers',new Auth().m,async ctx=>{
     let {groupId} = ctx.request.query
     let members = await Member.findMember(groupId)
     ctx.body = members.splice(0,3)
+})
+
+router.get('/getGroupByMember',new Auth().m,async ctx=>{
+    let {groupId} = ctx.request.query
+    let members = await Member.getGroupByMember(groupId)
+    ctx.body = members
 })
 
 router.post('/applicant',new Auth().m,async ctx=>{
@@ -57,6 +69,13 @@ router.post('/applicant',new Auth().m,async ctx=>{
     await Applicant.handleSubmit(applicant,ctx.auth.uid)
     success("成功递交申请！")
 })
+
+router.get('/getApplicantList',new Auth().m,async ctx=>{
+    let {groupId} = ctx.request.query
+    let applicants = await Applicant.getApplicantList(groupId)
+    return applicants
+})
+
 
 router.post('/approveJoin',new Auth().m,async (ctx)=>{
     let memberInfo = ctx.request.body

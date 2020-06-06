@@ -1,25 +1,14 @@
 
 const { Sequelize, Model,Op } = require('sequelize')
 const sequelize = require('../../core/db')
-
+const {defaultCoverImgs} = require('../../config/config')
 const {Member} = require('./groupMember')
+const {User} = require('./user')
 class GroupInfo extends Model {
     
 
     static async groupRegister(groupInfo,uid){
 
-        // return sequelize.transaction(async t=>{
-        //     await Favor.create({
-        //         activity_id,
-        //         type,
-        //         uid
-        //     },{transaction:t})
-        //     const activity = await Community.getData(activity_id,type)
-        //     await activity.increment('fav_nums',{
-        //         by:1,
-        //         transaction:t
-        //     })
-        // })
         let isGroup = await GroupInfo.findOne({
             where:{
                 college:groupInfo.college,
@@ -35,9 +24,15 @@ class GroupInfo extends Model {
                 await Member.create({
                     uid,
                     groupId:group.id,
-                    dapatment:"未知",
-                    poisition:"社长",
+                    dapartment:"社长团",
+                    position:"社长",
                     auth:16
+                },{transaction:t})
+                defaultCoverImgs.forEach(async url=>{
+                    await GroupCoverImgs.create({
+                        groupId:group.id,
+                        url
+                    })
                 },{transaction:t})
             })
         }else{
@@ -74,11 +69,11 @@ class GroupInfo extends Model {
                     [Op.in]: ids
                 },
             },
-            attributes:['groupName'],
+            attributes:['groupName','logo'],
             raw:true
         })
         let userGroups = groups.map((group,index)=>{
-            return {groupName:group.groupName,groupId:ids[index]}
+            return {groupName:group.groupName,groupId:ids[index],logo:group.logo}
         })
         return userGroups
 
@@ -99,7 +94,7 @@ class GroupInfo extends Model {
         })
         groupInfo.coverImgs = coverImgs.map(item=>{
             return item.url
-        }) || []
+        })
         return groupInfo
     }
 
@@ -118,9 +113,9 @@ GroupInfo.init({
     college:Sequelize.STRING,
     description:{type:Sequelize.STRING},
     logo:{type:Sequelize.STRING},
-    category:{type:Sequelize.STRING},
+    category:{type:Sequelize.STRING},   
     startTime:{type:Sequelize.DATEONLY},
-    tags:{type:Sequelize.STRING,defaultValue:"优秀,"},
+    tags:{type:Sequelize.STRING,defaultValue:"优秀,团结"},
     fav_nums:{type:Sequelize.INTEGER,defaultValue:0},
     good_nums:{type:Sequelize.INTEGER,defaultValue:0},
     concat:{type:Sequelize.STRING,defaultValue:'没有联系方式的话，小伙伴们会找不到你们哦/(ㄒoㄒ)/~~'},
@@ -131,7 +126,33 @@ GroupInfo.init({
 
 
 class Applicant extends Model{
+    static async getApplicantList(groupId){
+        groupId = parseInt(groupId)
+        let applicants = await Applicant.findAll({
+            where:{
+                groupId
+            },
+            raw:true
+        })
+        let uid_list =  applicants.map(applicant=>{
+            return applicant.uid 
+        })
+        let users = await User.findAll({
+            where:{
+                id: {
+                    [Op.in]: uid_list
+                }
+            },
+            raw:true,
+            attributes:['nickName','avatar','id']
+        
+        })
+        applicants = applicants.map((item,index)=>{
+            return Object.assign(item,users.find((user)=>user.id == item.uid))
+        })
 
+        return applicants
+    }
 
     static async handleSubmit(handleInfo,uid){
         let handleSubmit = await Applicant.findOne({

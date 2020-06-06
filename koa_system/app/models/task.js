@@ -109,8 +109,11 @@ TaskMember.init({
     taskId:Sequelize.INTEGER
 },{ sequelize, tableName: 'taskMember' })
 
+
+
 module.exports = {
     Task,
     TaskImgs,
     TaskMember
+    
 }

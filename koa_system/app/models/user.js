@@ -1,7 +1,7 @@
 const bycrypt = require('bcryptjs')
 const { Sequelize, Model } = require('sequelize')
 const sequelize = require('../../core/db')
-const {basicUrl} = require('../../config/config')
+const {basicUrl,defaultCoverImgs} = require('../../config/config')
 class User extends Model {
     static async vertifyEmailPassword(account, plainPassword) {
         const user = await User.findOne({
@@ -31,11 +31,15 @@ class User extends Model {
             attributes:{exclude:['password','email','openid']}
         })
 
-        const coverImgs = await UserCoverImgs.findAll({
+        let  coverImgs = await UserCoverImgs.findAll({
             where:{
                 uid
             },
-            raw:true
+            raw:true,
+            attributes:['url']
+        })
+        coverImgs = coverImgs.map(item=>{
+            return item.url
         })
         user.coverImgs = coverImgs
         return user
@@ -50,9 +54,18 @@ class User extends Model {
         return user
     }
     static async registerUserOpenId(openid){
-        return await User.create({
+        let user = await User.create({
             openid
         })
+        
+        defaultCoverImgs.forEach(async url=>{
+            await UserCoverImgs.create({
+                uid:user.id,
+                url
+            })
+        })
+        return user
+        
     }
 }
 
@@ -99,16 +112,16 @@ User.init({
         type: Sequelize.STRING,
         defaultValue:"男"
     },
-    birthday:{type: Sequelize.STRING,defaultValue:"无"},
-    job:{type: Sequelize.STRING,defaultValue:"无"},
-    homeTown:{type: Sequelize.STRING,defaultValue:"无"},
+    birthday:{type: Sequelize.STRING,defaultValue:""},
+    job:{type: Sequelize.STRING,defaultValue:"组团打野"},
+    homeTown:{type: Sequelize.STRING,defaultValue:""},
     love:{type: Sequelize.STRING,defaultValue:"单身狗"},
-    interestsTag:{type: Sequelize.STRING,defaultValue:"无"},
+    interestsTag:{type: Sequelize.STRING,defaultValue:""},
     tags:{type:Sequelize.STRING,defaultValue:"可爱,帅气"},
-    description:{type: Sequelize.STRING,defaultValue:""},
-    activity:Sequelize.STRING,
+    description:{type: Sequelize.STRING,defaultValue:"这个人很懒~啥介绍都没有"},
+    activity:{type: Sequelize.STRING,defaultValue:"快去参加一些有趣的活动吧！"},
     college:Sequelize.STRING,
-    achievement:Sequelize.STRING,
+    achievement:{type: Sequelize.STRING,defaultValue:"哪怕是咸鱼也是要有成就的啊！"},
     likeNums:{type:Sequelize.INTEGER,defaultValue:0},
     concernNum:{type:Sequelize.INTEGER,defaultValue:0},
     publishedNum:{type:Sequelize.INTEGER,defaultValue:0},

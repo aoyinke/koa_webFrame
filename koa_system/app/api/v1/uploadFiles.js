@@ -3,7 +3,7 @@ const Router = require('koa-router')
 
 const { Auth } = require('../../../middlewares/auth')
 
-const {Task,TaskImgs} = require('../../models/task')
+const {TaskImgs,Task} = require('../../models/task')
 const {UserCoverImgs} = require('../../models/user')
 const {ActivityImgs,ActivityVideos} = require('../../models/activityInfo')
 const {GroupInfo,GroupCoverImgs} = require('../../models/groupInfo')
@@ -87,3 +87,11 @@ router.post('/taskImgs',uploadImg,new Auth().m,async ctx=>{
   })
 })
 
+router.post('/taskCoverImg',uploadImg,new Auth().m,async ctx=>{
+  let taskId = ctx.request.body.taskId
+  let taskImg = ctx.files.uploadImgUrl
+  await Task.update({
+    taskId,
+    url:taskImg
+  })
+})
