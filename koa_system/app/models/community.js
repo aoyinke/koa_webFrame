@@ -10,11 +10,13 @@ const {
     Answer,
     Knowledge,
     ActivityImgs,
-    ActivityVideos
+    
 } = require('./activityInfo')
 const {GroupInfo} = require('../models/groupInfo')
 const {GetActivityInfo} = require('./getActivityInfo')
 const {Comment} = require('./comment')
+const {UserSavedCommunity} = require('./userSaved')
+
 const {User} = require('./user')
 class Community {
     constructor(art_id, type,category) {
@@ -25,7 +27,7 @@ class Community {
 
     static async getData(activity_id,type){
         let res = []
-        const finder = {where:{id:activity_id}}
+        const finder = {where:{id:activity_id},raw:true}
         switch (type){
             case 100:
                 res = await Activity.findOne(finder)
@@ -233,13 +235,10 @@ class Community {
             raw:true,
             attributes:['url']
         })
-        let videoSrc = await ActivityVideos.findOne({
-            where:{
-                activity_id
-            },
-            raw:true,
-            attributes:['url']
+        imgs = imgs.map(img=>{
+            return img.url
         })
+
         let comments = await Comment.getComment(activity_id)
         let info = []
         for(let i in comments){
@@ -257,13 +256,47 @@ class Community {
         
         if(res){
             res.comments = comments
-            res.videoSrc = videoSrc
             res.groupInfo = groupInfo
             res.imgs = imgs
         }
         
         return res
         
+    }
+
+    static async getUserSavedCommunity(uid){
+        let res = []
+        let userSavedList = await UserSavedCommunity.findAll({
+            where:{
+                uid
+            },
+            raw:true
+        })
+        res = userSavedList.map(async userSaved=>{
+            let {acitivity_id,type,groupId} = userSaved
+            let community = await Community.getData(acitivity_id,type)
+            let groupInfo = await GroupInfo.findOne({
+                where:{
+                    id:groupId
+                },
+                raw:true,
+                attributes:['logo','groupName','id','college','category']
+            })
+            let userInfo = await User.findOne({
+                where:{
+                    id:uid
+                },
+                raw:true,
+                attributes:['id','nickName','college','avatar']
+            })
+            community.groupInfo = groupInfo
+            community.userInfo = userInfo
+            return community
+        })
+        
+        
+        return res
+
     }
 }
 

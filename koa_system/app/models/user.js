@@ -133,6 +133,7 @@ User.init({
 }, { sequelize, tableName: 'user' })
 
 
+
 module.exports = {
     User,
     UserCoverImgs

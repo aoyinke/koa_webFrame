@@ -65,8 +65,8 @@ router.get('/getGroupByMember',new Auth().m,async ctx=>{
 })
 
 router.post('/applicant',new Auth().m,async ctx=>{
-    let applicant = ctx.request.body
-    await Applicant.handleSubmit(applicant,ctx.auth.uid)
+    let {reason,groupId} = ctx.request.body
+    await Applicant.handleSubmit(groupId,reason,ctx.auth.uid)
     success("成功递交申请！")
 })
 

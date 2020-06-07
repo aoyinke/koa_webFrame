@@ -154,17 +154,16 @@ class Applicant extends Model{
         return applicants
     }
 
-    static async handleSubmit(handleInfo,uid){
+    static async handleSubmit(groupId,reason,uid){
         let handleSubmit = await Applicant.findOne({
             where:{
-                groupId:handleInfo.groupId,
+                groupId:groupId,
                 uid
-
             }
         })
         let member = await Member.findOne({
             where:{
-                groupId:handleInfo.groupId,
+                groupId:groupId,
                 uid
             }
         })
@@ -175,7 +174,8 @@ class Applicant extends Model{
         }
         await Applicant.create({
             uid,
-            ...handleInfo
+            reason,
+            groupId
         })
     }
 
@@ -204,8 +204,7 @@ class Applicant extends Model{
 
 Applicant.init({
     groupId:Sequelize.STRING,
-    avatar:Sequelize.STRING,
-    nickName:Sequelize.STRING,
+    reason:Sequelize.STRING,
     uid:Sequelize.INTEGER
 }, { sequelize, tableName: 'applicant' })
 

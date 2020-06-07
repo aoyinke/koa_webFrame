@@ -30,15 +30,7 @@ const activityInfoDetails = {
         type: Sequelize.STRING
     }
 }
-class ActivityVideos extends Model{
 
-}
-ActivityVideos.init({
-    activity_id: Sequelize.INTEGER,
-    type:Sequelize.INTEGER,
-    url:Sequelize.STRING
-
-}, { sequelize, tableName: 'activityVideos' })
 
 class ActivityImgs extends Model{
 
@@ -80,6 +72,5 @@ module.exports = {
     Knowledge,
     Activity,
     Answer,
-    ActivityImgs,
-    ActivityVideos
+    ActivityImgs
 }
