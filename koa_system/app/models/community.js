@@ -12,6 +12,7 @@ const {
     ActivityImgs,
     
 } = require('./activityInfo')
+const {Favor} = require('./favor')
 const {GroupInfo} = require('../models/groupInfo')
 const {GetActivityInfo} = require('./getActivityInfo')
 const {Comment} = require('./comment')
@@ -31,14 +32,19 @@ class Community {
         switch (type){
             case 100:
                 res = await Activity.findOne(finder)
+                
+                res = await Community._findOtherInfo(res.groupId,activity_id,res,type)
                 break
             case 200:
                 res = await GroupDynamic.findOne(finder)
+                res = await Community._findOtherInfo(res.groupId,activity_id,res,type)
                 break
             case 300:
                 res = await Answer.findOne(finder)
+                res = await Community._findOtherInfo(res.groupId,activity_id,res,type)
             case 400:
                 res = await Knowledge.findOne(finder)
+                res = await Community._findOtherInfo(res.groupId,activity_id,res,type)
                 break
             default:
                 break
@@ -71,7 +77,7 @@ class Community {
             communities.push(await Community._getListByType(ids,key,currentPage,category))
         }
         
-        return communities[0]
+        return communities
 
         // return flatten(communities)
     }
@@ -153,7 +159,7 @@ class Community {
             let infoList = []
             if(res.data.length){
                 for(let i of res.data){
-                    let res = await Community._findOtherInfo(i.groupId,i.id,i)
+                    let res = await Community._findOtherInfo(i.groupId,i.id,i,type)
                     infoList.push(res)
                 }
             }
@@ -187,19 +193,19 @@ class Community {
         switch (type) {
             case 100:
                 communities = await Activity.findAndCountAll(finder)
-                info = await Community._addOtherInfo(communities.rows)
+                info = await Community._addOtherInfo(communities.rows,type)
                 key = "activities"
                 break
             case 200:
                 communities = await GroupDynamic.findAndCountAll(finder)
-                info = await Community._addOtherInfo(communities.rows)
+                info = await Community._addOtherInfo(communities.rows,type)
                 key = "dynamic"
                 break
             case 300:
                 break
             case 400:
                 communities = await Knowledge.findAndCountAll(finder)
-                info = await Community._addOtherInfo(communities.rows)
+                info = await Community._addOtherInfo(communities.rows,type)
                 key = "knowledge"
                 break
             default:
@@ -209,18 +215,19 @@ class Community {
         return {[key]:info}
     }
 
-    static async _addOtherInfo(communities){
+    static async _addOtherInfo(communities,type){
         let info = []
 
         for(let data in communities){
-            info.push(await Community._findOtherInfo(communities[data].groupId,communities[data].id,communities[data]))
+            info.push(await Community._findOtherInfo(communities[data].groupId,communities[data].id,communities[data],type))
 
         }
         return info
     }
     
-    static async _findOtherInfo(groupId,activity_id,data){
+    static async _findOtherInfo(groupId,activity_id,data,type){
         let res = data
+        let like_status = await Favor.userLikeIt(activity_id,type,data.uid)
         let groupInfo = await GroupInfo.findOne({
             where:{
                 id:groupId
@@ -258,6 +265,7 @@ class Community {
             res.comments = comments
             res.groupInfo = groupInfo
             res.imgs = imgs
+            res.like_status = like_status
         }
         
         return res
@@ -272,27 +280,21 @@ class Community {
             },
             raw:true
         })
-        res = userSavedList.map(async userSaved=>{
-            let {acitivity_id,type,groupId} = userSaved
-            let community = await Community.getData(acitivity_id,type)
-            let groupInfo = await GroupInfo.findOne({
-                where:{
-                    id:groupId
-                },
-                raw:true,
-                attributes:['logo','groupName','id','college','category']
-            })
+        for(let i in userSavedList){
+            let userSaved = userSavedList[i]
+            let {type,uid,activity_id} = userSaved
+            let community = await Community.getData(activity_id,type)
             let userInfo = await User.findOne({
                 where:{
                     id:uid
                 },
                 raw:true,
-                attributes:['id','nickName','college','avatar']
+                attributes:['avatar','nickName','id','college']
             })
-            community.groupInfo = groupInfo
-            community.userInfo = userInfo
-            return community
-        })
+            community = Object.assign(community,{userInfo})
+            res.push(community)
+        }
+
         
         
         return res

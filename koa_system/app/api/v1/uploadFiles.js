@@ -7,7 +7,7 @@ const {TaskImgs,Task} = require('../../models/task')
 const {UserCoverImgs} = require('../../models/user')
 const {ActivityImgs} = require('../../models/activityInfo')
 const {GroupInfo,GroupCoverImgs} = require('../../models/groupInfo')
-
+const {UserQuestionImg} = require('../../models/questions')
 const {uploadImg} = require('../../../utils/upload')
 const router = new Router({
     prefix:"/v1/uploadFiles"
@@ -26,7 +26,7 @@ router.post('/files',uploadImg,new Auth().m,async(ctx)=>{
       url:imgPath
   })
   }
-  ctx.body={imgPath:imgPath}
+  
 })
 
 router.post('/video',uploadImg,new Auth().m,async(ctx)=>{
@@ -40,8 +40,6 @@ router.post('/avatar',uploadImg,new Auth().m,async ctx=>{
   let avatar = ctx.files.uploadImgUrl
   ctx.body=avatar
 })
-
-
 
 
 router.post('/logo',uploadImg,new Auth().m,async ctx=>{
@@ -87,10 +85,27 @@ router.post('/taskImgs',uploadImg,new Auth().m,async ctx=>{
 router.post('/taskCoverImg',uploadImg,new Auth().m,async ctx=>{
   let taskId = ctx.request.body.taskId
   let taskImg = ctx.files.uploadImgUrl
+
   await Task.update({
-    taskId,
-    url:taskImg
+    coverImg:taskImg,
+    
+  },{
+    where:{
+      id:taskId
+    }
   })
 })
+
+
+router.post('/userQuestionImg',uploadImg,new Auth().m,async ctx=>{
+  let url = ctx.files.uploadImgUrl
+  let {questionId} = ctx.request.body
+  await UserQuestionImg.create({
+    questionId,
+    url
+  })
+})
+
+
 
 module.exports = router

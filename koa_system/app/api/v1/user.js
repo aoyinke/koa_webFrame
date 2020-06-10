@@ -38,4 +38,12 @@ router.get('/getUserInfo',new Auth().m,async(ctx)=>{
     let uesrInfo = await User.getUserInfo(ctx.auth.uid)
     ctx.body=uesrInfo
 })
+
+router.get('/visitOtherUser',new Auth().m,async ctx=>{
+    let {uid} = ctx.request.query
+    let userInfo = await User.getUserInfo(uid)
+    ctx.body = userInfo
+})
+
+
 module.exports = router

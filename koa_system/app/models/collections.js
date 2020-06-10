@@ -15,8 +15,9 @@ class Collections extends Model{
 
 }
 Collections.init({
+    type:Sequelize.INTEGER,
     groupId:Sequelize.INTEGER,
-    picture:Sequelize.STRING,
+    coverImg:Sequelize.STRING,
     title:Sequelize.STRING,
     description:Sequelize.STRING,
     content:Sequelize.STRING,
@@ -38,6 +39,7 @@ class CollectionsImgs extends Model{
 }
 
 CollectionsImgs.init({
+    type:Sequelize.INTEGER,
     collectionId:Sequelize.INTEGER,
     url:Sequelize.STRING
 }, { sequelize, tableName: 'collectionsImgs' })

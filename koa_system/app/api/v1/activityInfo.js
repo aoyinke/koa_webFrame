@@ -4,10 +4,11 @@ const {Auth} = require('../../../middlewares/auth')
 const {success} = require('../../lib/helper')
 
 const {ActivityValidator,AddCommentValidator} = require('@validator')
-
+const {basicUrl} = require('../../../config/config')
 const {Community} = require('../../models/community')
 const {Comment} = require('../../models/comment')
 const {User} = require('../../models/user')
+const {ActivityImgs} = require('../../models/activityInfo')
 const router = new Router({
     prefix:"/v1/ActivityInfo"
 })
@@ -66,7 +67,7 @@ router.post('/upLoadActivity',new Auth().m, async(ctx)=>{
 
 router.get('/userLiked',new Auth().m,async(ctx)=>{
     let {type,currentPage} = ctx.request.query
-    let community = []
+    let res = []
     let {interestsTag} = await User.findOne({
         id:ctx.auth.uid,
         raw:true,
@@ -76,9 +77,23 @@ router.get('/userLiked',new Auth().m,async(ctx)=>{
     interestsTag = interestsTag.split(',')
     for(let i of interestsTag){
         
-       let tmp = await Community.getCommunity(type,currentPage,i)
-       community.push(...tmp)
+        let tmp = await Community.getCommunity(type,currentPage,i)
+        res.push(...tmp)
     }
-    ctx.body = community
+    ctx.body = res
+})
+
+
+router.post('/deleteCommunityImg',new Auth().m, async(ctx)=>{
+    let {imgUrl} = ctx.request.body
+
+    if(imgUrl){
+        imgUrl = imgUrl.replace(basicUrl,'')
+        await ActivityImgs.deleteImg(imgUrl)
+    }
+    ctx.body = "删除成功"
+    
+    
+
 })
 module.exports = router

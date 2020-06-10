@@ -5,7 +5,18 @@ const sequelize = require('../../core/db')
 const {Community} = require('../models/community')
 
 class Favor extends Model{
-    
+
+    static async userLikeIt(activity_id, type, uid) {
+        const favor = await Favor.findOne({
+            where: {
+                activity_id,
+                uid,
+                type,
+            }
+        })
+        return favor ? true : false
+    }
+
     static async likeActivity(activity_id,type,uid){
         const favor = await Favor.findOne({
             where:{

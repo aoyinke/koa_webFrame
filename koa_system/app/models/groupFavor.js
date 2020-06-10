@@ -6,6 +6,16 @@ const {GroupInfo} = require('../models/groupInfo')
 
 class GroupFavor extends Model{
     
+    static async userLikeIt(groupId, uid) {
+        const favor = await GroupFavor.findOne({
+            where: {
+                groupId,
+                uid
+            }
+        })
+        return favor ? true : false
+    }
+
     static async likeGroup(groupId,uid){
         const favor = await GroupFavor.findOne({
             where:{
@@ -67,7 +77,6 @@ class GroupFavor extends Model{
 GroupFavor.init({
     uid:Sequelize.INTEGER,
     groupId:Sequelize.INTEGER,
-    status:{type:Sequelize.INTEGER,defaultValue:0}
 }, { sequelize, tableName: 'groupFavor' })
 
 

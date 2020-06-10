@@ -30,6 +30,12 @@ router.get('/findUserGroup',new Auth().m,async (ctx)=>{
     ctx.body = info
 })
 
+router.get('/findOtherGroup',new Auth().m,async (ctx)=>{
+    let {uid} = ctx.request.query
+    let info = await GroupInfo.findUserGroup(uid)
+    ctx.body = info
+})
+
 router.get('/findGroupList',new Auth().m,async ctx=>{
     let {college} = ctx.request.query
     let groups = await GroupInfo.findAll({

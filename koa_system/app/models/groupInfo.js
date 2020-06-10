@@ -69,11 +69,12 @@ class GroupInfo extends Model {
                     [Op.in]: ids
                 },
             },
-            attributes:['groupName','logo'],
+            attributes:['groupName','logo','description','tags',"category",'id'],
             raw:true
         })
-        let userGroups = groups.map((group,index)=>{
-            return {groupName:group.groupName,groupId:ids[index],logo:group.logo}
+        let userGroups = groups.map((group)=>{
+            let {groupName,logo,description,tags,category} = group
+            return {groupName,groupId:ids.find(id=>group.id == id),logo,description,tags,category}
         })
         return userGroups
 
