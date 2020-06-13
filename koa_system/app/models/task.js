@@ -1,9 +1,55 @@
 
-const { Sequelize, Model } = require('sequelize')
+const { Sequelize, Model,Op } = require('sequelize')
 const sequelize = require('../../core/db')
-
-
+const fs = require('fs')
+const {User} = require('./user')
 class Task extends Model{
+
+    static async getTaskInfo(taskId){
+        let taskInfo = await Task.findOne({
+            where:{
+                id:taskId
+            },
+            raw:true
+        })
+        let taskImgs = await TaskImgs.findAll({
+            where:{
+                taskId
+            },
+            raw:true
+        })
+
+        let members = await TaskMember.findAll({
+            where:{
+                taskId
+            },
+            raw:true
+        })
+        let uids = members.map(member=>{
+            return member.uid
+        })
+        let user = await User.findAll({
+            where:{
+                id:{
+                    [Op.in]:uids
+                }
+            },
+            raw:true,
+            attributes:['nickName','id','avatar']
+        })
+        members = members.map(member=>{
+            let userInfo = user.find(item=>item.id === member.uid)
+            return Object.assign(member,userInfo)
+        })
+
+        taskInfo.taskImgs = taskImgs.map(taskImg=>{
+            return taskImg.url
+        })
+        taskInfo.joinedPeople = members
+        return taskInfo
+    }
+
+    
 
     static async getTaskList(groupId,belongActivity){
         let finder = {}
@@ -93,7 +139,31 @@ Task.init({
 },{ sequelize, tableName: 'task' })
 
 class TaskImgs extends Model{
-    
+    static async deleteTaskImg(taskId,url){
+        let img = await TaskImgs.findOne({
+            where:{
+                taskId,
+                url
+            }
+        })
+
+        if(!img){
+            throw new global.errs.CoverImgError()
+        }
+
+        let pathUrl = url.replace(basicUrl,'')
+
+        return sequelize.transaction(async t=>{
+            await img.destroy({
+                force:true,
+                transaction:t
+            })  
+            fs.unlinkSync(pathUrl)
+            
+        })
+        
+        
+    }
 }
 
 TaskImgs.init({

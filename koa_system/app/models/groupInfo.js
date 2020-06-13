@@ -1,10 +1,13 @@
 
 const { Sequelize, Model,Op } = require('sequelize')
 const sequelize = require('../../core/db')
-const {defaultCoverImgs} = require('../../config/config')
+const {defaultCoverImgs,basicUrl} = require('../../config/config')
+
 const {Member} = require('./groupMember')
 const {User} = require('./user')
 const {GroupFavor} = require('./groupFavor')
+const fs = require('fs')
+const path = require('path')
 class GroupInfo extends Model {
     
 
@@ -214,7 +217,37 @@ Applicant.init({
 
 
 class GroupCoverImgs extends Model{
+    static async deleteGroupCoverImg(groupId,url){
+        let img = await GroupCoverImgs.findOne({
+            where:{
+                groupId,
+                url
+            }
+        })
 
+        if(!img){
+            throw new global.errs.CoverImgError()
+        }
+
+        let pathUrl = url.replace(basicUrl,'')
+        if(pathUrl.startsWith('static')){
+            await img.destroy({
+                force:true
+
+            })
+            return
+        }else{
+            return sequelize.transaction(async t=>{
+                await img.destroy({
+                    force:true,
+                    transaction:t
+                })  
+                fs.unlinkSync(pathUrl)
+                
+            })
+        }
+        
+    }
 }
 
 GroupCoverImgs.init({

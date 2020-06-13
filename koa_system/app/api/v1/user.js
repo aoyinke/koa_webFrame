@@ -3,7 +3,7 @@ const router = new Router({
     prefix: '/v1/user'
 })
 const { RegisterValidator,UpdateUserInfoValidator } = require('../../validators/validators')
-const { User } = require('../../models/user')
+const { User, UserCoverImgs } = require('../../models/user')
 const {success} = require('../../lib/helper')
 const {Auth} = require('../../../middlewares/auth')
 
@@ -45,5 +45,9 @@ router.get('/visitOtherUser',new Auth().m,async ctx=>{
     ctx.body = userInfo
 })
 
+router.post('/deleteCoverImg',new Auth().m,async (ctx)=>{
+    let {url} = ctx.request.body
+    await UserCoverImgs.deleteUserCoverImg(ctx.auth.uid,url)
+})
 
 module.exports = router

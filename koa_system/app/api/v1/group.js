@@ -2,7 +2,7 @@ const Router = require('koa-router')
 
 const {Auth} = require('../../../middlewares/auth')
 const {success} = require('../../lib/helper')
-const {GroupInfo,Applicant} = require('../../models/groupInfo')
+const {GroupInfo,Applicant,GroupCoverImgs} = require('../../models/groupInfo')
 const {Member} = require('../../models/groupMember')
 const {GroupInfoValidator} = require('../../validators/validators')
 const router = new Router({
@@ -109,5 +109,11 @@ router.post('/updateGroupInfo',new Auth().m,async (ctx)=>{
             id:info.id
         }
     })
+})
+
+
+router.post('/deleteCoverImg',new Auth().m,async (ctx)=>{
+    let {groupId,url} = ctx.request.body
+    await GroupCoverImgs.deleteGroupCoverImg(groupId,url)
 })
 module.exports = router

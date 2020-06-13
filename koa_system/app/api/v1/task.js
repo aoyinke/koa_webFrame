@@ -8,6 +8,17 @@ const router = new Router({
 })
 
 
+router.get('/getTaskInfo',new Auth().m,async ctx=>{
+    let {taskId} = ctx.request.query
+    let taskInfo = await Task.getTaskInfo(taskId)
+    ctx.body = taskInfo
+})
+
+router.post('/deleteCoverImg',new Auth().m,async (ctx)=>{
+    let {taskId,url} = ctx.request.body
+    await TaskImgs.deleteTaskImg(taskId,url)
+})
+
 router.get('/taskList',new Auth().m,async ctx=>{
     let {groupId,belongActivity} = ctx.request.query
     let taskList = await Task.getTaskList(groupId,belongActivity)

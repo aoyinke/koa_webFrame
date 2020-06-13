@@ -93,7 +93,7 @@ class SaveError extends HttpException{
         super()
         this.code = 400
         this.msg = "该动态已经收藏过"
-        this.error_code = 60004
+        this.error_code = 60005
     }
 }
 
@@ -102,7 +102,7 @@ class CancelSaveError extends HttpException{
         super()
         this.code = 400
         this.msg = "你已取消收藏"
-        this.error_code = 60004
+        this.error_code = 60006
     }
 }
 
@@ -111,7 +111,7 @@ class NeedFavorError extends HttpException{
         super()
         this.code = 400
         this.msg = "你已支持该需求"
-        this.error_code = 60004
+        this.error_code = 60007
     }
 }
 
@@ -120,7 +120,16 @@ class CancelFavorError extends HttpException{
         super()
         this.code = 400
         this.msg = "你已取消支持该需求"
-        this.error_code = 60004
+        this.error_code = 60008
+    }
+}
+
+class CoverImgError extends HttpException{
+    constructor(msg, error_code) {
+        super()
+        this.code = 400
+        this.msg = "已删除该图片"
+        this.error_code = 60009
     }
 }
 
@@ -138,5 +147,6 @@ module.exports = {
     SaveError,
     CancelSaveError,
     NeedFavorError,
-    CancelFavorError
+    CancelFavorError,
+    CoverImgError
 }

@@ -2,6 +2,8 @@ const bycrypt = require('bcryptjs')
 const { Sequelize, Model } = require('sequelize')
 const sequelize = require('../../core/db')
 const {basicUrl,defaultCoverImgs} = require('../../config/config')
+const fs = require('fs')
+const path = require('path')
 class User extends Model {
     static async vertifyEmailPassword(account, plainPassword) {
         const user = await User.findOne({
@@ -70,7 +72,37 @@ class User extends Model {
 }
 
 class UserCoverImgs extends Model{
+    static async deleteUserCoverImg(uid,url){
+        let img = await UserCoverImgs.findOne({
+            where:{
+                uid,
+                url
+            }
+        })
 
+        if(!img){
+            throw new global.errs.CoverImgError("用户封面图片不存在")
+        }
+
+        let pathUrl = url.replace(basicUrl,'')
+        if(pathUrl.startsWith('static')){
+            await img.destroy({
+                force:true
+
+            })
+            return
+        }else{
+            return sequelize.transaction(async t=>{
+                await img.destroy({
+                    force:true,
+                    transaction:t
+                })  
+                fs.unlinkSync(pathUrl)
+                
+            })
+        }
+        
+    }
 }
 
 UserCoverImgs.init({

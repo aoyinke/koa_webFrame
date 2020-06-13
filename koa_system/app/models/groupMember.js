@@ -65,7 +65,7 @@ class Member extends Model{
         let userIds = members.map(member=>{
             return member.uid
         })
-        let userInfo = await User.findAll({
+        let users = await User.findAll({
             where:{
                 id:{
                     [Op.in]:userIds
@@ -75,7 +75,8 @@ class Member extends Model{
             attributes:['avatar','nickName','id']
         })
         members = members.map((member,index)=>{
-            return Object.assign(member,userInfo[index])
+            let userInfo = users.find(item=>item.id === member.uid)
+            return Object.assign(member,userInfo)
         })
         members = members.map((member)=>{
             let auth = member.auth

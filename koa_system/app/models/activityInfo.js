@@ -35,16 +35,25 @@ const activityInfoDetails = {
 
 class ActivityImgs extends Model{
     static async deleteImg(url){
-        let imgPath = path.join(__dirname,url)
-        imgPath = imgPath.split('\\').reduce((accumulator,currentValue)=>{
-            return accumulator + '/' + currentValue
-        })
-        ActivityImgs.destroy({
-            where:{
-                url
-            }
-        })
-        fs.unlinkSync(imgPath)
+        if(url.startsWith('static')){
+            ActivityImgs.destroy({
+                where:{
+                    url
+                }
+            })
+        }else{
+            let imgPath = path.join(__dirname,url)
+            imgPath = imgPath.split('\\').reduce((accumulator,currentValue)=>{
+                return accumulator + '/' + currentValue
+            })
+            ActivityImgs.destroy({
+                where:{
+                    url
+                }
+            })
+            fs.unlinkSync(imgPath)
+        }
+        
         
     }
 }
