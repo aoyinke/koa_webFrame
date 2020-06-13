@@ -2,7 +2,6 @@
 const { Sequelize, Model } = require('sequelize')
 const sequelize = require('../../core/db')
 
-const {GroupInfo} = require('../models/groupInfo')
 
 class GroupFavor extends Model{
     
@@ -31,6 +30,7 @@ class GroupFavor extends Model{
                 groupId,
                 uid
             },{transaction:t})
+           let {GroupInfo} = require('./groupInfo')
             const group = await GroupInfo.findOne({
                 where:{
                     id:groupId
@@ -59,6 +59,7 @@ class GroupFavor extends Model{
                 force:true,
                 transaction:t
             })
+            let {GroupInfo} = require('./groupInfo')
             const group = await GroupInfo.findOne({
                 where:{
                     id:groupId

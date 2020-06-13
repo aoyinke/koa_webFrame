@@ -21,7 +21,7 @@ router.post('/register', new Auth().m,async (ctx)=>{
 
 router.get('/detail',new Auth().m,async (ctx)=>{
     let {groupId} = ctx.request.query
-    let groupInfo = await GroupInfo.getGroupInfo(groupId)
+    let groupInfo = await GroupInfo.getGroupInfo(groupId,ctx.auth.uid)
     ctx.body = groupInfo
 })
 

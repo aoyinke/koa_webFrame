@@ -2,8 +2,18 @@
 const { Sequelize, Model,Op } = require('sequelize')
 const sequelize = require('../../core/db')
 const {User} = require('./user')
-
+const {NeedFavor} = require('./favor')
 class Need extends Model{
+
+    static async findNeed(needId,category){
+        let needInfo = await Need.findOne({
+            where:{
+                id:needId,
+                category
+            }
+        })
+        return needInfo
+    }
 
     static async getNeedList(currentPage,category){
         let type = ''
@@ -41,15 +51,21 @@ class Need extends Model{
                 raw:true,
                 attributes:['avatar','nickName','college','id']
             })
-            needs = needs.rows.map(item=>{
+            let tmp = []
+            let res = {}
+            for(let i = 0;i<needs.rows.length;i++){
+                let {uid,id,category} = needs.rows[i]
                 if(Array.isArray(users)){
-                    userInfo = users.find(user=> user.id === item.uid)
+                    userInfo = users.find(user=> user.id === uid)
                 }else{
                     userInfo = users
                 }
-                
-                return Object.assign(item,{userInfo:userInfo})
-            })
+                let fav_status = await NeedFavor.userLikeIt(id,category,uid)
+                res = Object.assign(needs.rows[i],{userInfo:userInfo,fav_status})
+                tmp.push(res)
+            }
+            needs = tmp
+             
         }
         
         return needs

@@ -4,6 +4,7 @@ const sequelize = require('../../core/db')
 const {defaultCoverImgs} = require('../../config/config')
 const {Member} = require('./groupMember')
 const {User} = require('./user')
+const {GroupFavor} = require('./groupFavor')
 class GroupInfo extends Model {
     
 
@@ -80,7 +81,8 @@ class GroupInfo extends Model {
 
     }
 
-    static async getGroupInfo(groupId){
+    static async getGroupInfo(groupId,uid){
+        let fav_status = await GroupFavor.userLikeIt(groupId,uid)
         let groupInfo =  await GroupInfo.findOne({
             where:{
                 id:groupId
@@ -96,6 +98,7 @@ class GroupInfo extends Model {
         groupInfo.coverImgs = coverImgs.map(item=>{
             return item.url
         })
+        groupInfo.fav_status = fav_status
         return groupInfo
     }
 

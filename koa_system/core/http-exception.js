@@ -88,6 +88,42 @@ class GroupRegisterError extends HttpException{
         this.error_code = 60004
     }
 }
+class SaveError extends HttpException{
+    constructor(msg, error_code) {
+        super()
+        this.code = 400
+        this.msg = "该动态已经收藏过"
+        this.error_code = 60004
+    }
+}
+
+class CancelSaveError extends HttpException{
+    constructor(msg, error_code) {
+        super()
+        this.code = 400
+        this.msg = "你已取消收藏"
+        this.error_code = 60004
+    }
+}
+
+class NeedFavorError extends HttpException{
+    constructor(msg, error_code) {
+        super()
+        this.code = 400
+        this.msg = "你已支持该需求"
+        this.error_code = 60004
+    }
+}
+
+class CancelFavorError extends HttpException{
+    constructor(msg, error_code) {
+        super()
+        this.code = 400
+        this.msg = "你已取消支持该需求"
+        this.error_code = 60004
+    }
+}
+
 module.exports = {
     HttpException,
     ParameterException,
@@ -98,5 +134,9 @@ module.exports = {
     LikeError,
     DislikeError,
     SubmitError,
-    GroupRegisterError
+    GroupRegisterError,
+    SaveError,
+    CancelSaveError,
+    NeedFavorError,
+    CancelFavorError
 }

@@ -17,7 +17,6 @@ const {GroupInfo} = require('../models/groupInfo')
 const {GetActivityInfo} = require('./getActivityInfo')
 const {Comment} = require('./comment')
 const {UserSavedCommunity} = require('./userSaved')
-
 const {User} = require('./user')
 class Community {
     constructor(art_id, type,category) {
@@ -26,9 +25,9 @@ class Community {
         this.category = category
     }
 
-    static async getData(activity_id,type){
+    static async getData(activity_id,type,needRaw=true){
         let res = []
-        const finder = {where:{id:activity_id},raw:true}
+        const finder = {where:{id:activity_id},raw:needRaw}
         switch (type){
             case 100:
                 res = await Activity.findOne(finder)
@@ -228,6 +227,7 @@ class Community {
     static async _findOtherInfo(groupId,activity_id,data,type){
         let res = data
         let like_status = await Favor.userLikeIt(activity_id,type,data.uid)
+        let save_status = await UserSavedCommunity.userSaveIt(activity_id,type,data.uid)
         let groupInfo = await GroupInfo.findOne({
             where:{
                 id:groupId
@@ -264,6 +264,7 @@ class Community {
         if(res){
             res.comments = comments
             res.groupInfo = groupInfo
+            res.save_status = save_status
             res.imgs = imgs
             res.like_status = like_status
         }
