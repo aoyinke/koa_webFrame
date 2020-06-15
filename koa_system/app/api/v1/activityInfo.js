@@ -14,8 +14,10 @@ const router = new Router({
 })
 
 
-router.get('/:list/getComment', async (ctx)=>{
-    
+router.get('/getCommunityVideo',new Auth().m, async (ctx)=>{
+    let {currentPage} = ctx.request.query
+    let videos = await Community.getCommunityVideo(currentPage)
+    ctx.body = videos
 })
 
 router.post('/addComment', new Auth().m, async (ctx)=>{

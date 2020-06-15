@@ -5,6 +5,33 @@ const {User} = require('./user')
 const {NeedFavor} = require('./favor')
 class Need extends Model{
 
+    static async findUserNeed(uid){
+        let needList = await Need.findAll({
+            where:{
+                uid
+            },
+            raw:true
+        })
+
+        let uids = needList.map(item=>{
+            return item.uid
+        })
+
+        let userList = await User.findAll({
+            where:{
+                id:{
+                    [Op.in]:uids
+                }
+            }
+        })
+
+        needList = needList.map(need=>{
+            let userInfo = userList.find(user=> user.id === need.uid)
+            return Object.assign(need,{userInfo})
+        })
+        return needList
+    }
+    
     static async findNeed(needId,category){
         let needInfo = await Need.findOne({
             where:{
@@ -20,13 +47,13 @@ class Need extends Model{
         let userInfo
         category = parseInt(category)
         switch(category){
-            case 100:
+            case 102:
                 type="众投活动"
                 break
             case 101:
                 type="梦想成真"
                 break
-            case 102:
+            case 100:
                 type="技能需求"
                 break
         }
@@ -66,6 +93,8 @@ class Need extends Model{
             }
             needs = tmp
              
+        }else{
+            return []
         }
         
         return needs

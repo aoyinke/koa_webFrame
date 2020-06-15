@@ -166,9 +166,7 @@ class GetActivityValidator extends LinValidator{
 class UpdateUserInfoValidator extends LinValidator{
     constructor(){
         super()
-        this.nickName = [
-            new Rule('isLength', 'nickName不能为空', { min: 1})
-        ]
+        
     }
 }
 module.exports = {

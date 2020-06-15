@@ -17,14 +17,13 @@ const router = new Router({
 
 router.post('/files',uploadImg,new Auth().m,async(ctx)=>{
   let {type,activity_id} = ctx.request.body
-  
   let imgPath = ctx.files.uploadImgUrl
-  if(imgPath){
-    await ActivityImgs.create({
-      type,
-      activity_id,
-      url:imgPath
-  })
+  
+  if(imgPath.length){
+    let tmp = imgPath.map(img=>{
+      return {type,activity_id,url:img}
+    })
+    await ActivityImgs.bulkCreate(tmp)
   }
   
 })
@@ -38,7 +37,7 @@ router.post('/video',uploadImg,new Auth().m,async(ctx)=>{
 
 router.post('/avatar',uploadImg,new Auth().m,async ctx=>{
   let avatar = ctx.files.uploadImgUrl
-  ctx.body=avatar
+  ctx.body=avatar[0]
 })
 
 
@@ -46,7 +45,7 @@ router.post('/logo',uploadImg,new Auth().m,async ctx=>{
   let groupId = ctx.request.body.groupId
   let logo = ctx.files.uploadImgUrl
   await GroupInfo.update({
-    logo:logo
+    logo:logo[0]
   },{
     where:{
         id:groupId
@@ -58,28 +57,29 @@ router.post('/logo',uploadImg,new Auth().m,async ctx=>{
 router.post('/userCoverImgs',uploadImg,new Auth().m,async ctx=>{
 
   let userCoverImg = ctx.files.uploadImgUrl
-  await UserCoverImgs.create({
-    uid:ctx.auth.uid,
-    url:userCoverImg
+  userCoverImg = userCoverImg.map(item=>{
+    return {uid:ctx.auth.uid,url:item}
   })
+  await UserCoverImgs.bulkCreate(userCoverImg)
 })
 
 router.post('/groupCoverImgs',uploadImg,new Auth().m,async ctx=>{
   let groupId = ctx.request.body.groupId
   let groupCoverImg = ctx.files.uploadImgUrl
-  await GroupCoverImgs.create({
-    groupId,
-    url:groupCoverImg
+  groupCoverImg = groupCoverImg.map(item=>{
+    return {groupId,url:item}
   })
+  await GroupCoverImgs.bulkCreate(groupCoverImg)
 })
 
 router.post('/taskImgs',uploadImg,new Auth().m,async ctx=>{
   let taskId = ctx.request.body.taskId
   let taskImg = ctx.files.uploadImgUrl
-  await TaskImgs.create({
-    taskId,
-    url:taskImg
+
+  taskImg = taskImg.map(item=>{
+    return {taskId,url:item}
   })
+  await TaskImgs.bulkCreate(taskImg)
 })
 
 router.post('/taskCoverImg',uploadImg,new Auth().m,async ctx=>{
@@ -87,7 +87,7 @@ router.post('/taskCoverImg',uploadImg,new Auth().m,async ctx=>{
   let taskImg = ctx.files.uploadImgUrl
 
   await Task.update({
-    coverImg:taskImg,
+    coverImg:taskImg[0],
     
   },{
     where:{
@@ -100,10 +100,10 @@ router.post('/taskCoverImg',uploadImg,new Auth().m,async ctx=>{
 router.post('/userQuestionImg',uploadImg,new Auth().m,async ctx=>{
   let url = ctx.files.uploadImgUrl
   let {questionId} = ctx.request.body
-  await UserQuestionImg.create({
-    questionId,
-    url
+  url = url.map(item=>{
+    return {questionId,url:item}
   })
+  await UserQuestionImg.bulkCreate(url)
 })
 
 

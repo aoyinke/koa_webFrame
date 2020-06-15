@@ -7,7 +7,6 @@ const {Member} = require('./groupMember')
 const {User} = require('./user')
 const {GroupFavor} = require('./groupFavor')
 const fs = require('fs')
-const path = require('path')
 class GroupInfo extends Model {
     
 
@@ -28,7 +27,7 @@ class GroupInfo extends Model {
                 await Member.create({
                     uid,
                     groupId:group.id,
-                    dapartment:"社长团",
+                    department:"社长团",
                     position:"社长",
                     auth:16
                 },{transaction:t})
@@ -105,6 +104,25 @@ class GroupInfo extends Model {
         return groupInfo
     }
 
+    static async getGroupInfoByName(groupName){
+        let groupInfo =  await GroupInfo.findOne({
+            where:{
+                groupName
+            },
+            raw:true
+        })
+        let coverImgs = await GroupCoverImgs.findAll({
+            where:{
+                groupId:groupInfo.id
+            },
+            attributes:['url']
+        })
+        groupInfo.coverImgs = coverImgs.map(item=>{
+            return item.url
+        })
+        return groupInfo
+    }
+
     
     
 }
@@ -141,24 +159,27 @@ class Applicant extends Model{
             },
             raw:true
         })
-        let uid_list =  applicants.map(applicant=>{
-            return applicant.uid 
-        })
-        let users = await User.findAll({
-            where:{
-                id: {
-                    [Op.in]: uid_list
-                }
-            },
-            raw:true,
-            attributes:['nickName','avatar','id']
-        
-        })
-        applicants = applicants.map((item,index)=>{
-            return Object.assign(item,users.find((user)=>user.id == item.uid))
-        })
-
-        return applicants
+        if(applicants.length){
+            let uid_list =  applicants.map(applicant=>{
+                return applicant.uid 
+            })
+            let users = await User.findAll({
+                where:{
+                    id: {
+                        [Op.in]: uid_list
+                    }
+                },
+                raw:true,
+                attributes:['nickName','avatar','id']
+            
+            })
+            applicants = applicants.map((item,index)=>{
+                return Object.assign(item,users.find((user)=>user.id == item.uid))
+            })
+    
+            return applicants
+        }
+        return []
     }
 
     static async handleSubmit(groupId,reason,uid){
@@ -186,7 +207,7 @@ class Applicant extends Model{
         })
     }
 
-    static async approveJoinGroup(memberInfo,uid){
+    static async approveJoinGroup(memberInfo){
 
         
 
@@ -194,18 +215,31 @@ class Applicant extends Model{
             await Applicant.destroy({
                 where:{
                     groupId:memberInfo.groupId,
-                    uid
+                    uid:memberInfo.uid
                     
                 },
                 force:true,
                 transaction:t
             })
             await Member.create({
-                uid,
-                ...memberInfo
+                ...memberInfo,
+                auth:4
             },{transaction:t})
             
         })
+    }
+
+    static async declineJoinGroup(memberInfo){
+
+            await Applicant.destroy({
+                where:{
+                    groupId:memberInfo.groupId,
+                    uid:memberInfo.uid
+                    
+                },
+                force:true
+            })
+            
     }
 }
 

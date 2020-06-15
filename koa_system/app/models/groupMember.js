@@ -1,10 +1,34 @@
 
-const { Sequelize, Model,Op } = require('sequelize')
+const { Sequelize, Model,Op, where } = require('sequelize')
 const sequelize = require('../../core/db')
 const {User} = require('./user')
 const {classifiedAccordingToKey} = require('../../utils/groupby')
 class Member extends Model{
 
+    static async getUserAuth(uid){
+        let userGroups = await Member.findAll({
+            where:{
+                uid
+            }
+        })
+    }
+    static async updateMember(groupMember){
+        Object.keys(groupMember).forEach(department=>{
+            let members = groupMember[department]
+            members.forEach(async item=>{
+                await Member.update({
+                    ...item
+                },{
+                    where:{
+                        id:item.id,
+                        groupId:item.groupId,
+                        uid:item.uid
+                    }
+                })
+            })
+            
+        })
+    }
     static async changeMemberAuth(groupId,memberId,auth,department){
         let auth_value = 0
         switch(auth){
@@ -74,7 +98,7 @@ class Member extends Model{
             raw:true,
             attributes:['avatar','nickName','id']
         })
-        members = members.map((member,index)=>{
+        members = members.map((member)=>{
             let userInfo = users.find(item=>item.id === member.uid)
             return Object.assign(member,userInfo)
         })
@@ -100,7 +124,7 @@ class Member extends Model{
 Member.init({
     uid:{type:Sequelize.INTEGER},
     groupId:{type:Sequelize.INTEGER},
-    department:Sequelize.STRING,
+    department:{type:Sequelize.STRING},
     position:Sequelize.STRING,
     auth:Sequelize.INTEGER
 },{ sequelize, tableName: 'groupMember' })

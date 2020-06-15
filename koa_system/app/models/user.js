@@ -2,8 +2,8 @@ const bycrypt = require('bcryptjs')
 const { Sequelize, Model } = require('sequelize')
 const sequelize = require('../../core/db')
 const {basicUrl,defaultCoverImgs} = require('../../config/config')
+const {UserFavor} = require('./favor')
 const fs = require('fs')
-const path = require('path')
 class User extends Model {
     static async vertifyEmailPassword(account, plainPassword) {
         const user = await User.findOne({
@@ -24,12 +24,12 @@ class User extends Model {
     }
 
 
-    static async getUserInfo(uid){
+    static async getUserInfo(uid,raw=true){
         const user = await User.findOne({
             where:{
                 id:uid
             },
-            raw:true,
+            raw:raw,
             attributes:{exclude:['password','email','openid']}
         })
 
@@ -46,6 +46,32 @@ class User extends Model {
         user.coverImgs = coverImgs
         return user
     }
+
+    static async visitOtherUser(other_uid,uid){
+        const user = await User.findOne({
+            where:{
+                id:other_uid
+            },
+            raw:true,
+            attributes:{exclude:['password','email','openid']}
+        })
+
+        let favor_status = await UserFavor.userLikeIt(other_uid,uid)
+        let  coverImgs = await UserCoverImgs.findAll({
+            where:{
+                uid
+            },
+            raw:true,
+            attributes:['url']
+        })
+        coverImgs = coverImgs.map(item=>{
+            return item.url
+        })
+        user.coverImgs = coverImgs
+        user.favor_status = favor_status
+        return user
+    }
+
     
     static async getUserByOpenid(openid){
         const user = await User.findOne({

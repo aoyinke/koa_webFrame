@@ -41,7 +41,7 @@ router.get('/getUserInfo',new Auth().m,async(ctx)=>{
 
 router.get('/visitOtherUser',new Auth().m,async ctx=>{
     let {uid} = ctx.request.query
-    let userInfo = await User.getUserInfo(uid)
+    let userInfo = await User.visitOtherUser(uid,ctx.auth.uid)
     ctx.body = userInfo
 })
 
@@ -49,5 +49,6 @@ router.post('/deleteCoverImg',new Auth().m,async (ctx)=>{
     let {url} = ctx.request.body
     await UserCoverImgs.deleteUserCoverImg(ctx.auth.uid,url)
 })
+
 
 module.exports = router

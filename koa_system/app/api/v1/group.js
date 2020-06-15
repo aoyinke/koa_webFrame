@@ -18,9 +18,19 @@ router.post('/register', new Auth().m,async (ctx)=>{
     ctx.body = group
 })
 
+router.get('/changeGroup',new Auth().m,async (ctx)=>{
+    let {name} = ctx.request.query
+    let groupInfo = await GroupInfo.getGroupInfoByName(name)
+    ctx.body = groupInfo
+})
 
 router.get('/detail',new Auth().m,async (ctx)=>{
     let {groupId} = ctx.request.query
+    let groupInfo = await GroupInfo.getGroupInfo(groupId,ctx.auth.uid)
+    ctx.body = groupInfo
+})
+
+router.get('/getUserGroupAuth',new Auth().m,async (ctx)=>{
     let groupInfo = await GroupInfo.getGroupInfo(groupId,ctx.auth.uid)
     ctx.body = groupInfo
 })
@@ -85,8 +95,14 @@ router.get('/getApplicantList',new Auth().m,async ctx=>{
 
 router.post('/approveJoin',new Auth().m,async (ctx)=>{
     let memberInfo = ctx.request.body
-    await Applicant.approveJoinGroup(memberInfo,ctx.auth.uid)
+    await Applicant.approveJoinGroup(memberInfo)
     success("同意加入")
+})
+
+router.post('/declineJoin',new Auth().m,async (ctx)=>{
+    let memberInfo = ctx.request.body
+    await Applicant.declineJoinGroup(memberInfo)
+    success("拒绝加入")
 })
 
 router.post('/join',new Auth().m,async (ctx)=>{
@@ -95,6 +111,12 @@ router.post('/join',new Auth().m,async (ctx)=>{
         uid:ctx.auth.uid,
         ...info
     })
+    success("创建接口")
+})
+
+router.post('/updateMember',new Auth().m,async (ctx)=>{
+    let info = ctx.request.body
+    await Member.updateMember(info)
     success("创建接口")
 })
 

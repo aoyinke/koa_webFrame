@@ -8,6 +8,11 @@ const router = new Router({
 })
 
 
+router.get('/findUserNeed',new Auth().m,async ctx=>{
+    let needList = await Need.findUserNeed(ctx.auth.uid)
+    ctx.body = needList
+})
+
 router.get('/needList',new Auth().m,async ctx=>{
     let {currentPage,category} = ctx.request.query
     let needList = await Need.getNeedList(currentPage,category)

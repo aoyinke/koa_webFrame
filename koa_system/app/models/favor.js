@@ -150,7 +150,77 @@ NeedFavor.init({
     category:Sequelize.STRING
 }, { sequelize, tableName: 'needFavor' })
 
+class UserFavor extends Model{
+    
+    static async userLikeIt(favor_uid,uid) {
+        const favor = await UserFavor.findOne({
+            where: {
+                favor_uid,
+                uid,
+            }
+        })
+        return favor ? true : false
+    }
+
+    static async likeUser(favor_uid,uid){
+        const need = await UserFavor.findOne({
+            where:{
+                favor_uid,
+                uid
+            }
+        })
+        if(need){
+            throw new global.errs.NeedFavorError("已经收藏该用户")
+        }
+        return sequelize.transaction(async t=>{
+            await UserFavor.create({
+                favor_uid,
+                uid
+            },{transaction:t})
+            let  {User} = require('./user')
+            const userInfo = await User.getUserInfo(uid,false)
+            await userInfo.increment('likeNums',{
+                by:1,
+                transaction:t
+            })
+        })
+    }
+
+    static async dislikeUser(favor_uid,uid){
+        const need = await UserFavor.findOne({
+            where:{
+                favor_uid,
+                uid
+            }
+            
+        })
+        if(!need){
+            throw new global.errs.CancelNeedFavorError()
+        }
+        return sequelize.transaction(async t=>{
+            await need.destroy({
+                force:true,
+                transaction:t
+            })
+            let  {User} = require('./user')
+            const userInfo = await User.getUserInfo(uid)
+            await userInfo.decrement('fav_nums',{
+                by:1,
+                transaction:t
+            })
+        })
+    }
+}
+
+UserFavor.init({
+    uid:Sequelize.INTEGER,
+    favor_uid:Sequelize.INTEGER
+    
+}, { sequelize, tableName: 'userFavor' })
+
+
 module.exports = {
     Favor,
-    NeedFavor
+    NeedFavor,
+    UserFavor
 }

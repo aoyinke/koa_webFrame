@@ -5,12 +5,23 @@ const {Auth} = require('../../../middlewares/auth')
 const {LikeValidator} = require('../../validators/validators')
 const {success} = require('../../lib/helper')
 
-const {Favor,NeedFavor} = require('../../models/favor')
+const {Favor,NeedFavor,UserFavor} = require('../../models/favor')
 const {GroupFavor} = require('../../models/groupFavor')
 const router = new Router({
     prefix:"/v1/like"
 })
 
+router.get('/savedGroup',new Auth().m,async(ctx)=>{
+    
+    let res = await GroupFavor.findAll({
+        where:{
+            uid:ctx.auth.uid
+        },
+        raw:true
+    })
+    ctx.body = res.length
+    
+})
 
 router.post('/activity',new Auth().m,async(ctx)=>{
     const v = await new LikeValidator().validate(ctx,{
@@ -60,8 +71,17 @@ router.post('/dislikeNeed',new Auth().m,async ctx=>{
     
 })
 
-router.post('/cancelLikeNeed',new Auth().m,async ctx=>{
+router.post('/likeUser',new Auth().m,async ctx=>{
 
-    let {needId,category} = ctx.request.body    
+    let {favor_uid} = ctx.request.body    
+    await UserFavor.likeUser(favor_uid,ctx.auth.uid)
+    success("收藏该用户成功！")
+})
+
+router.post('/dislikeUser',new Auth().m,async ctx=>{
+
+    let {favor_uid} = ctx.request.body    
+    await UserFavor.dislikeUser(favor_uid,ctx.auth.uid)
+    success("取消收藏该用户成功！")
 })
 module.exports = router

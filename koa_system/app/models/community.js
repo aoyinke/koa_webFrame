@@ -5,6 +5,10 @@ const {
 } = require('sequelize')
 
 const {
+    flatten
+} = require('lodash')
+
+const {
     Activity,
     GroupDynamic,
     Answer,
@@ -23,6 +27,37 @@ class Community {
         this.art_id = art_id
         this.type = type
         this.category = category
+    }
+
+    static async getCommunityVideo(currentPage){
+        let communityList = await GetActivityInfo.findAll({
+            raw:true
+        })
+
+        let communityObj = {
+            100:[],
+            200:[],
+            300:[],
+            400:[]
+        }
+
+        for(let communityInfo of communityList){
+            communityObj[communityInfo.type].push(communityInfo.activity_id)
+        }
+        const communities = []
+        for(let key in communityObj){
+            const ids = communityObj[key]
+            if(ids.length == 0){
+                continue
+            }
+
+            key = parseInt(key)
+            communities.push(await Community._getListByTypeVideo(ids,key,currentPage))
+        }
+        let res = flatten(communities)
+
+        res = res.filter(item=>item.videoSrc)
+        return res
     }
 
     static async getData(activity_id,type,needRaw=true){
@@ -271,6 +306,44 @@ class Community {
         
         return res
         
+    }
+
+    static async _getListByTypeVideo(ids, type,currentPage) {
+        let offset = (currentPage - 1) * 10;
+        let key = ""
+        let communities = []
+        const finder = {
+            //offet去掉前多少个数据
+            offset,
+            //limit每页数据数量
+            limit: 10,
+            where: {
+                id: {
+                    [Op.in]: ids
+                }
+            },
+            raw:true
+
+        }
+        switch (type) {
+            case 100:
+                communities = await Activity.findAndCountAll(finder)
+                key = "activities"
+                break
+            case 200:
+                communities = await GroupDynamic.findAndCountAll(finder)
+                key = "dynamic"
+                break
+            case 300:
+                break
+            case 400:
+                communities = await Knowledge.findAndCountAll(finder)
+                key = "knowledge"
+                break
+            default:
+                break
+        }
+        return communities.rows
     }
 
     static async getUserSavedCommunity(uid){
