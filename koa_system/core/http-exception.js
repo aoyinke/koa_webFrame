@@ -133,6 +133,15 @@ class CoverImgError extends HttpException{
     }
 }
 
+class RemoveGroupError extends HttpException{
+    constructor(msg, error_code) {
+        super()
+        this.code = 400
+        this.msg = "无该成员"
+        this.error_code = 60009
+    }
+}
+
 module.exports = {
     HttpException,
     ParameterException,
@@ -148,5 +157,6 @@ module.exports = {
     CancelSaveError,
     NeedFavorError,
     CancelFavorError,
-    CoverImgError
+    CoverImgError,
+    RemoveGroupError
 }

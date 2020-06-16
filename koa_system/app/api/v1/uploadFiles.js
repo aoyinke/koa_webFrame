@@ -8,6 +8,7 @@ const {UserCoverImgs} = require('../../models/user')
 const {ActivityImgs} = require('../../models/activityInfo')
 const {GroupInfo,GroupCoverImgs} = require('../../models/groupInfo')
 const {UserQuestionImg} = require('../../models/questions')
+const {Collections,CollectionsImgs} = require('../../models/collections')
 const {uploadImg} = require('../../../utils/upload')
 const router = new Router({
     prefix:"/v1/uploadFiles"
@@ -96,6 +97,32 @@ router.post('/taskCoverImg',uploadImg,new Auth().m,async ctx=>{
   })
 })
 
+router.post('/collectionImgs',uploadImg,new Auth().m,async ctx=>{
+  let {collectionId,type} = ctx.request.body.taskId
+  let imgs = ctx.files.uploadImgUrl
+
+  imgs = imgs.map(item=>{
+    return {collectionId,type,url:item}
+  })
+
+  await CollectionsImgs.bulkCreate(imgs)
+  
+})
+
+router.post('/collectionCoverImg',uploadImg,new Auth().m,async ctx=>{
+  let {collectionId,type} = ctx.request.body.taskId
+  let coverImg = ctx.files.uploadImgUrl
+
+  await Collections.update({
+    picture:coverImg[0],
+    
+  },{
+    where:{
+      id:collectionId,
+      type
+    }
+  })
+})
 
 router.post('/userQuestionImg',uploadImg,new Auth().m,async ctx=>{
   let url = ctx.files.uploadImgUrl

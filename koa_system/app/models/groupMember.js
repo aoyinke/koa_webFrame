@@ -5,7 +5,35 @@ const {User} = require('./user')
 const {classifiedAccordingToKey} = require('../../utils/groupby')
 class Member extends Model{
 
-    
+    static async updateMemberDepartment(members){
+        if(members.length){
+            members.forEach(async member=>{
+                await Member.update({
+                    ...member
+                },{
+                    where:{
+                        uid:member.uid,
+                        groupId:member.groupId
+                    }
+                })
+            })
+        }
+        
+    }
+    static async removeFromGroup(groupId,uid){
+        let member = await Member.findOne({
+            where:{
+                groupId,
+                uid
+            }
+        })
+        if(!member){
+            throw new global.errs.RemoveGroupError()
+        }
+        await member.destroy({
+            force:true
+        })
+    }
     static async updateMember(groupMember){
         Object.keys(groupMember).forEach(department=>{
             let members = groupMember[department]

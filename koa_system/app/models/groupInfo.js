@@ -64,13 +64,13 @@ class GroupInfo extends Model {
                         url
                     })
                 },{transaction:t})
+                return group
             })
         }else{
             throw new global.errs.GroupRegisterError()
         }
         
-        
-
+    
     }
 
     static async findGroupColleges(){

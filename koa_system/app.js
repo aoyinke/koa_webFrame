@@ -11,7 +11,7 @@ require('@models/activityInfo')
 require('@models/comment')
 require('@models/groupInfo')
 require('@models/getActivityInfo')
-
+require('@models/collections')
 const app = new Koa()
 app.use(catchError)
 

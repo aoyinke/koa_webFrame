@@ -25,6 +25,17 @@ router.post('/register', new Auth().m,async (ctx)=>{
     ctx.body = group
 })
 
+
+router.post('/updateMemberDepartment', new Auth().m,async (ctx)=>{
+    let members = ctx.request.body
+    await Member.updateMemberDepartment(members)
+})
+
+router.post('/removeFromGroup', new Auth().m,async (ctx)=>{
+    let {groupId,uid} = ctx.request.body
+    await Member.removeFromGroup(groupId,uid)
+})
+
 router.get('/changeGroup',new Auth().m,async (ctx)=>{
     let {name} = ctx.request.query
     let groupInfo = await GroupInfo.getGroupInfoByName(name)
