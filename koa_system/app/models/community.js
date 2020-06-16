@@ -206,7 +206,7 @@ class Community {
     }
 
     static async _getListByType(ids, type,currentPage,category) {
-        let offset = (currentPage - 1) * 10;
+        let offset = (currentPage - 1) * 2;
         let info = []
         let key = ""
         let communities = []
@@ -214,7 +214,7 @@ class Community {
             //offet去掉前多少个数据
             offset,
             //limit每页数据数量
-            limit: 10,
+            limit: 2,
             where: {
                 id: {
                     [Op.in]: ids
@@ -245,7 +245,7 @@ class Community {
             default:
                 break
         }
-        console.log(info)
+        
         return {[key]:info}
     }
 

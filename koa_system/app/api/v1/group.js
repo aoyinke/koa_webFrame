@@ -11,6 +11,13 @@ const router = new Router({
 
 
 
+
+router.get('/getUserAuth',new Auth().m,async (ctx)=>{
+    
+    let groupAuth = await GroupInfo.getUserAuth(ctx.auth.uid)
+    ctx.body = groupAuth
+})
+
 router.post('/register', new Auth().m,async (ctx)=>{
     const v =  await new GroupInfoValidator().validate(ctx)
     const  groupInfo = v.get('body')

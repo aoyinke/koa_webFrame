@@ -9,6 +9,33 @@ const {GroupFavor} = require('./groupFavor')
 const fs = require('fs')
 class GroupInfo extends Model {
     
+    static async getUserAuth(uid){
+        let userGroups = await Member.findAll({
+            where:{
+                uid
+            },
+            raw:true,
+            attributes:['auth','groupId','uid']
+        })
+        let res = []
+        let groupIds = userGroups.map(item=>{
+            return item.groupId
+        })
+        let groupInfoList = await GroupInfo.findAll({
+            where:{
+                id:{
+                    [Op.in]:groupIds
+                }
+            },
+            raw:true,
+            attributes:['id','groupName']
+        })
+        userGroups.forEach(group=>{
+            let groupInfo = groupInfoList.find(item=> item.id === group.groupId)
+            res.push(Object.assign(group,groupInfo))
+        })
+        return res
+    }
 
     static async groupRegister(groupInfo,uid){
 

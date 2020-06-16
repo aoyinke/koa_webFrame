@@ -5,13 +5,7 @@ const {User} = require('./user')
 const {classifiedAccordingToKey} = require('../../utils/groupby')
 class Member extends Model{
 
-    static async getUserAuth(uid){
-        let userGroups = await Member.findAll({
-            where:{
-                uid
-            }
-        })
-    }
+    
     static async updateMember(groupMember){
         Object.keys(groupMember).forEach(department=>{
             let members = groupMember[department]
