@@ -36,6 +36,11 @@ router.post('/removeFromGroup', new Auth().m,async (ctx)=>{
     await Member.removeFromGroup(groupId,uid)
 })
 
+router.post('/deleteFromDepartment', new Auth().m,async (ctx)=>{
+    let memberInfo = ctx.request.body
+    await Member.deleteFromDepartment(memberInfo)
+})
+
 router.get('/changeGroup',new Auth().m,async (ctx)=>{
     let {name} = ctx.request.query
     let groupInfo = await GroupInfo.getGroupInfoByName(name)
@@ -82,8 +87,8 @@ router.get('/findGroupColleges',new Auth().m,async ctx=>{
 })
 
 router.post('/changeMemberAuth',new Auth().m,async ctx=>{
-    let {auth,department,groupId,id} = ctx.request.body
-    await Member.changeMemberAuth(groupId,id,auth,department)
+    let {auth,department,groupId,id,position} = ctx.request.body
+    await Member.changeMemberAuth(groupId,id,auth,department,position)
 })
 
 router.get('/groupMembers',new Auth().m,async ctx=>{
@@ -107,7 +112,7 @@ router.post('/applicant',new Auth().m,async ctx=>{
 router.get('/getApplicantList',new Auth().m,async ctx=>{
     let {groupId} = ctx.request.query
     let applicants = await Applicant.getApplicantList(groupId)
-    return applicants
+    ctx.body = applicants
 })
 
 

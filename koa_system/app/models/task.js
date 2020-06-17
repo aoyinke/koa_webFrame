@@ -3,6 +3,7 @@ const { Sequelize, Model,Op } = require('sequelize')
 const sequelize = require('../../core/db')
 const fs = require('fs')
 const {User} = require('./user')
+const {GroupInfo} = require('./groupInfo')
 class Task extends Model{
 
     static async getTaskInfo(taskId){
@@ -180,10 +181,46 @@ TaskMember.init({
 },{ sequelize, tableName: 'taskMember' })
 
 
+class TaskMessages extends Model{
+    static async getGroupMessage(groupId,taskId){
+        let messageList = await TaskMessages.findAll({
+            where:{
+                groupId,
+                taskId
+            },
+            raw:true
+        })
+
+        let uids = messageList.map(item=>item.uid)
+        let userList = await User.findAll({
+            where:{
+                id:{
+                    [Op.in]:uids
+                }
+            },
+            raw:true,
+            attributes:['nickName','id','avatar']
+        })
+
+        messageList = messageList.map(item=>{
+            let userInfo = userList.find(user=> user.id === item.uid)
+            return Object.assign(item,userInfo)
+        })
+
+        return messageList
+    }   
+}
+TaskMessages.init({
+    uid:Sequelize.INTEGER,
+    taskId:Sequelize.INTEGER,
+    groupId:Sequelize.INTEGER,
+    message:Sequelize.STRING
+},{ sequelize, tableName: 'taskMessages' })
 
 module.exports = {
     Task,
     TaskImgs,
-    TaskMember
+    TaskMember,
+    TaskMessages
     
 }

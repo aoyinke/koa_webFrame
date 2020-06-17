@@ -200,13 +200,15 @@ class Applicant extends Model{
                 attributes:['nickName','avatar','id']
             
             })
-            applicants = applicants.map((item,index)=>{
+            applicants = applicants.map((item)=>{
                 return Object.assign(item,users.find((user)=>user.id == item.uid))
             })
     
             return applicants
+        }else{
+            return []
         }
-        return []
+        
     }
 
     static async handleSubmit(groupId,reason,uid){
@@ -216,12 +218,13 @@ class Applicant extends Model{
                 uid
             }
         })
-        let member = await Member.findOne({
-            where:{
-                groupId:groupId,
-                uid
-            }
-        })
+        // let member = await Member.findOne({
+        //     where:{
+        //         groupId:groupId,
+        //         uid
+        //     }
+        // })
+        let member = ""
         if(handleSubmit){
             throw new global.errs.SubmitError()
         }else if( !handleSubmit && member){

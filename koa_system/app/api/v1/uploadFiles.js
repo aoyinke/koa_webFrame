@@ -98,7 +98,7 @@ router.post('/taskCoverImg',uploadImg,new Auth().m,async ctx=>{
 })
 
 router.post('/collectionImgs',uploadImg,new Auth().m,async ctx=>{
-  let {collectionId,type} = ctx.request.body.taskId
+  let {collectionId,type} = ctx.request.body
   let imgs = ctx.files.uploadImgUrl
 
   imgs = imgs.map(item=>{
@@ -110,7 +110,7 @@ router.post('/collectionImgs',uploadImg,new Auth().m,async ctx=>{
 })
 
 router.post('/collectionCoverImg',uploadImg,new Auth().m,async ctx=>{
-  let {collectionId,type} = ctx.request.body.taskId
+  let {collectionId,type} = ctx.request.body
   let coverImg = ctx.files.uploadImgUrl
 
   await Collections.update({

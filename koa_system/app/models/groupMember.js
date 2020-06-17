@@ -1,9 +1,21 @@
 
-const { Sequelize, Model,Op, where } = require('sequelize')
+const { Sequelize, Model,Op } = require('sequelize')
 const sequelize = require('../../core/db')
 const {User} = require('./user')
 const {classifiedAccordingToKey} = require('../../utils/groupby')
 class Member extends Model{
+
+    static async deleteFromDepartment(memberInfo){
+        let {groupId,uid} = memberInfo
+        await Member.update({
+            department:""
+        },{
+            where:{
+                groupId:groupId,
+                uid:uid
+            }
+        })
+    }
 
     static async updateMemberDepartment(members){
         if(members.length){
@@ -51,7 +63,7 @@ class Member extends Model{
             
         })
     }
-    static async changeMemberAuth(groupId,memberId,auth,department){
+    static async changeMemberAuth(groupId,memberId,auth,department,position){
         let auth_value = 0
         switch(auth){
             case "社长权限":
@@ -67,7 +79,8 @@ class Member extends Model{
         }
         await Member.update({
             auth:auth_value,
-            department
+            department,
+            position
         },{
             where:{
                 groupId,
@@ -102,6 +115,7 @@ class Member extends Model{
     }
 
     static async getGroupByMember(groupId){
+        let peopleWithNoDepartment = []
         let members = await Member.findAll({
             where:{
                 groupId
@@ -134,8 +148,14 @@ class Member extends Model{
                 return Object.assign(member,{auth:'成员权限'})
             }
         })
+        members = members.filter(item=>{
+            if(!item.department){
+                peopleWithNoDepartment.push(item)
+            }
+            return item.department
+        })
         members = classifiedAccordingToKey(members,'department')
-        return members
+        return {members:members,peopleWithNoDepartment}
     }
 
     
@@ -147,7 +167,7 @@ Member.init({
     uid:{type:Sequelize.INTEGER},
     groupId:{type:Sequelize.INTEGER},
     department:{type:Sequelize.STRING},
-    position:Sequelize.STRING,
+    position:{type:Sequelize.STRING,defaultValue:"无"},
     auth:Sequelize.INTEGER
 },{ sequelize, tableName: 'groupMember' })
 

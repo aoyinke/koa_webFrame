@@ -2,11 +2,25 @@ const Router = require('koa-router')
 
 const {Auth} = require('../../../middlewares/auth')
 const {success} = require('../../lib/helper')
-const {Task,TaskImgs} = require('../../models/task')
+const {Task,TaskImgs,TaskMessages} = require('../../models/task')
 const router = new Router({
     prefix:"/v1/task"
 })
 
+
+router.get('/uploadTaskMessage',new Auth().m,async ctx=>{
+    let messageInfo= ctx.request.query
+    await TaskMessages.create({
+        ...messageInfo
+    })
+    success("上传进度成功")
+})
+
+router.get('/getTaskMessages',new Auth().m,async ctx=>{
+    let {taskId,groupId} = ctx.request.query
+    let messageList = await TaskMessages.getGroupMessage(groupId,taskId)
+    ctx.body = messageList
+})
 
 router.get('/getTaskInfo',new Auth().m,async ctx=>{
     let {taskId} = ctx.request.query
