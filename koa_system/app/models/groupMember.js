@@ -17,11 +17,11 @@ class Member extends Model{
         })
     }
 
-    static async updateMemberDepartment(members){
+    static async updateMemberDepartment(members,department){
         if(members.length){
             members.forEach(async member=>{
                 await Member.update({
-                    ...member
+                    department
                 },{
                     where:{
                         uid:member.uid,

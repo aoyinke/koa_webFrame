@@ -23,6 +23,9 @@ class Collections extends Model{
                 },
                 raw:true
             })
+            collecitonImgs = collecitonImgs.map(item=>{
+                return item.url
+            })
             collections[i].images = collecitonImgs
         }
 

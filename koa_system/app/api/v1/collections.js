@@ -17,8 +17,8 @@ router.post('/publishCollections', new Auth().m,async (ctx)=>{
 
 })
 
-router.get('/publishCollections', new Auth().m,async (ctx)=>{
-    let {type,groupId} = ctx.request.body
+router.get('/getCollections', new Auth().m,async (ctx)=>{
+    let {type,groupId} = ctx.request.query
     let collectionList = await Collections.getColleciton(type,groupId)
     ctx.body = collectionList
 

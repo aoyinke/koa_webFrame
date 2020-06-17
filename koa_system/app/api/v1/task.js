@@ -8,12 +8,34 @@ const router = new Router({
 })
 
 
-router.get('/uploadTaskMessage',new Auth().m,async ctx=>{
-    let messageInfo= ctx.request.query
+router.post('/uploadTaskMessage',new Auth().m,async ctx=>{
+    let messageInfo= ctx.request.body
     await TaskMessages.create({
-        ...messageInfo
+        ...messageInfo,
+        uid:ctx.auth.uid
     })
     success("上传进度成功")
+})
+
+
+router.post('/addCheckNums',new Auth().m,async ctx=>{
+    let {taskId,groupId} = ctx.request.body
+    let task = await Task.findOne({
+        where:{
+            groupId,
+            id:taskId
+        }
+    })
+    await task.increment('click_nums',{
+        by:1,
+    })
+    success("阅读成功")
+})
+
+router.get('/getLatestMessage',new Auth().m,async ctx=>{
+    let {groupId} = ctx.request.query
+    let info = await TaskMessages.getLatestMessage(groupId)
+    ctx.body = info
 })
 
 router.get('/getTaskMessages',new Auth().m,async ctx=>{

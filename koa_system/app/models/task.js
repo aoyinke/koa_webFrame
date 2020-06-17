@@ -182,6 +182,38 @@ TaskMember.init({
 
 
 class TaskMessages extends Model{
+    static async getLatestMessage(groupId){
+        let res = []
+        let taskList = await Task.findAll({
+            where:{
+                groupId
+            },
+            raw:true
+        })
+
+        for(let i = 0;i < taskList.length;i++){
+            let taskInfo = taskList[i]
+            let latestInfo = await TaskMessages.findAll({
+            
+                where:{
+                    taskId:taskInfo.id
+                },
+                raw:true
+            })
+            let user = await User.findOne({
+                where:{
+                    id:latestInfo[0].uid
+                },
+                raw:true,
+                attributes:['nickName','id','avatar']
+            })
+            res.push(Object.assign(taskInfo,user,{latestMessage:latestInfo[0]}))
+        }
+
+        return taskList
+        
+    }
+
     static async getGroupMessage(groupId,taskId){
         let messageList = await TaskMessages.findAll({
             where:{

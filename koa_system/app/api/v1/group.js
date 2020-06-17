@@ -27,8 +27,8 @@ router.post('/register', new Auth().m,async (ctx)=>{
 
 
 router.post('/updateMemberDepartment', new Auth().m,async (ctx)=>{
-    let members = ctx.request.body
-    await Member.updateMemberDepartment(members)
+    let {members,department} = ctx.request.body
+    await Member.updateMemberDepartment(members,department)
 })
 
 router.post('/removeFromGroup', new Auth().m,async (ctx)=>{
